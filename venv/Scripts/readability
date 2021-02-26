@@ -1,0 +1,3 @@
+#!D:\GitHub\textReadabilityClassifier\venv\Scripts\python.exe
+import readability
+readability.main()
