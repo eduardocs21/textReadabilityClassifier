@@ -14,8 +14,6 @@ class Result:
 class FleschKincaid:
     def __init__(self, stats):
         self._stats = stats
-        if stats.num_words < 100:
-            raise ReadabilityException('100 words required.')
 
     def score(self):
         score = self._score()
