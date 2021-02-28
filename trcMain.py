@@ -3,16 +3,18 @@ import nltk
 # nltk.download('punkt')
 import os
 import svm_evaluation
+import grammar
 
-dirPath = 'test_data'
-numberOfFoldsForCrossVal = 5
+training_dirPath = 'training_data'
+test_dirPath = 'test_data'
+numberOfFoldsForCrossVal = 10
 
-dataMetrics = []
-dataGrade = []
+data_metrics = []
+data_grades = []
 
 # train/test with files in the directory
-for file in os.listdir(dirPath):
-    with open(dirPath + '/' + file, encoding='utf-8') as f:
+for file in os.listdir(training_dirPath):
+    with open(training_dirPath + '/' + file, encoding='utf-8') as f:
         text = f.read()
         f.close()
 
@@ -25,22 +27,37 @@ for file in os.listdir(dirPath):
     if textType == "song" or textType == "dialog" or textType == "cloze":
         continue
 
-    print(file)
     r = Readability(text)
 
     # calculate readability scores and save as data
-    dataMetrics.append([r.flesch_kincaid().score, r.flesch().score, r.gunning_fog().score, r.coleman_liau().score,
-                        r.dale_chall().score, r.ari().score, r.linsear_write().score, r.spache().score])
+    data_metrics.append([r.flesch_kincaid().score, r.flesch().score, r.gunning_fog().score, r.coleman_liau().score,
+                         r.dale_chall().score, r.ari().score, r.linsear_write().score, r.spache().score])
 
-    dataGrade.append(textGrade)
+    data_grades.append(textGrade)
 
-print(dataMetrics)
-print(dataGrade)
-print('size of data set: ' + str(len(dataMetrics)))
+print(data_metrics)
+print(data_grades)
+print('size of data set: ' + str(len(data_metrics)))
 
-scores = svm_evaluation.crossValidation(dataMetrics, dataGrade, numberOfFoldsForCrossVal)
+# cross-validation
+scores = svm_evaluation.crossValidation(data_metrics, data_grades, numberOfFoldsForCrossVal)
 accuracy = sum(scores) / numberOfFoldsForCrossVal
-print('accuracy = ' + str(accuracy))
+print('f1-score = ' + str(accuracy))
 
 
+# prediction of new data
+for file in os.listdir(test_dirPath):
+    with open(test_dirPath + '/' + file, encoding='utf-8') as f:
+        text = f.read()
+        f.close()
 
+    r = Readability(text)
+
+    test_metrics = [[r.flesch_kincaid().score, r.flesch().score, r.gunning_fog().score, r.coleman_liau().score,
+                     r.dale_chall().score, r.ari().score, r.linsear_write().score, r.spache().score]]
+
+    print(test_metrics)
+    print(svm_evaluation.predict(data_metrics, data_grades, test_metrics))
+
+    # grammar checking of new data
+    grammar.checkGrammar_KLP7(text)
