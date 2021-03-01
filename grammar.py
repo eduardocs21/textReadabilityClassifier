@@ -19,7 +19,7 @@ def checkGrammar_KLP7(text):
 
 
     # can/can't
-    
+
     # imperatives
 
     # have got
