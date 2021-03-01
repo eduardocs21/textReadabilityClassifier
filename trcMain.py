@@ -12,7 +12,7 @@ numberOfFoldsForCrossVal = 10
 data_metrics = []
 data_grades = []
 
-# train/test with files in the directory
+# calculate scores for training data
 for file in os.listdir(training_dirPath):
     with open(training_dirPath + '/' + file, encoding='utf-8') as f:
         text = f.read()
@@ -39,10 +39,11 @@ print(data_metrics)
 print(data_grades)
 print('size of data set: ' + str(len(data_metrics)))
 
+
 # cross-validation
-scores = svm_evaluation.crossValidation(data_metrics, data_grades, numberOfFoldsForCrossVal)
-accuracy = sum(scores) / numberOfFoldsForCrossVal
-print('f1-score = ' + str(accuracy))
+# scores = svm_evaluation.crossValidation(data_metrics, data_grades, numberOfFoldsForCrossVal)
+# accuracy = sum(scores) / numberOfFoldsForCrossVal
+# print('f1-score = ' + str(accuracy))
 
 
 # prediction of new data
@@ -56,8 +57,13 @@ for file in os.listdir(test_dirPath):
     test_metrics = [[r.flesch_kincaid().score, r.flesch().score, r.gunning_fog().score, r.coleman_liau().score,
                      r.dale_chall().score, r.ari().score, r.linsear_write().score, r.spache().score]]
 
-    print(test_metrics)
-    print(svm_evaluation.predict(data_metrics, data_grades, test_metrics))
+    print('---------')
+    print('readability results: ' + str(test_metrics))
+    print('difficulty of input text is similar to a text from grade: ' + str(svm_evaluation.predict(
+        data_metrics, data_grades, test_metrics)))
+    print('---------')
+    print('Grammar: ')
+
 
     # grammar checking of new data
     grammar.checkGrammar_KLP7(text)

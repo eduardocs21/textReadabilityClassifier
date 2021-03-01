@@ -1,6 +1,5 @@
 import re
-
-personalPronouns = 'I', 'You', 'We'
+from re import Pattern, Match
 
 
 def checkGrammar_KLP7(text):
@@ -9,14 +8,18 @@ def checkGrammar_KLP7(text):
     # plural of nouns
     # s-genitive
     # adverbs (of frequency)
-    # pos-tagging
+        # pos-tagging
     # adjective (comparative)
-    # pos-tagging
+        # pos-tagging
 
 # 2)
-    # personal pronouns + be
+    # personal pronouns
+    search('personal pronouns', ['i', 'you', 'he', 'She', 'it', 'we', 'they'], text)
+
+
+
     # can/can't
-    print(re.findall('can', text))
+    
     # imperatives
 
     # have got
@@ -38,3 +41,16 @@ def checkGrammar_KLP7(text):
 
 def checkGrammar_KLP9():
     print('checking')
+
+
+def search(name, search_terms, text):
+    for pp in search_terms:
+        if re.search(pp, text):
+            print(name + ': YES')
+            return
+
+    print(name + ': NO')
+
+
+def search_detailed(name, search_terms, text):
+    print('X')
