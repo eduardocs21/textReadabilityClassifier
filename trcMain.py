@@ -37,7 +37,7 @@ for file in os.listdir(training_dirPath):
 
 print(data_metrics)
 print(data_grades)
-print('size of data set: ' + str(len(data_metrics)))
+print('size of used data set: ' + str(len(data_metrics)))
 
 
 # cross-validation
