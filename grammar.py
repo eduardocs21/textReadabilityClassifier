@@ -6,21 +6,27 @@ import nltk
 
 def checkGrammar_KLP7(text):
 
-    # preparation (get string and pos-tags)
-    text = str(text.lower())
+    # preparation (convert to string, generate pos-tags and change all text to lowercase)
+    text = str(text)
     pos_text = nltk.pos_tag(nltk.word_tokenize(text))
+    print(pos_text)
 
 # 1)
     # plural of nouns
     print(search_postags(pos_text, ['NNS', 'NNPS'], "plural of nouns"))
     print()
 
-
     # s-genitive
+    print(search_postags(pos_text, ['POS'], "possessive ending (s-Genitiv)"))
+    print()
+
     # adverbs (of frequency)
-        # pos-tagging
-    # adjective (comparative)
-        # pos-tagging
+    print(search_postags(pos_text, ['RB'], "adverbs"))
+    print()
+
+    # comparative adjectives and adverbs
+    print(search_postags(pos_text, ['JJR', 'JJS', 'RBR', 'RBS'], "comparative adjectives (and adverbs)"))
+    print()
 
 # 2)
     # personal pronouns
@@ -103,9 +109,11 @@ def search_postags(pos_text, pos_tags, name):
             if word[1] == pos_tag:
                 words.append(word[0])
 
-    # if there are matches, print it out and return a dictionary containing word frequencies
+    # if there are matches, print it out and return a dictionary containing word frequencies (all lowercase)
     if words:
         print(name + ': YES --- Details:')
+        for i in range(0, len(words)):
+            words[i] = words[i].lower()
         for item in words:
             frequency[item] = words.count(item)
         return frequency
@@ -115,7 +123,7 @@ def search_postags(pos_text, pos_tags, name):
 
 
 # searches for possessive pronouns and differentiates them between possessive determiners and pronouns
-# returns separate frequency dictionaries
+# returns separate word lists (all lowercase)
 def search_possessive_pronouns(pos_text):
     pd_words = []
     pp_words = []
@@ -137,6 +145,12 @@ def search_possessive_pronouns(pos_text):
                     pd_words.append(word[0])
                 else:
                     pp_words.append(word[0])
+
+    # to lowercase
+    for i in range(0, len(pd_words)):
+        pd_words[i] = pd_words[i].lower()
+    for i in range(0, len(pp_words)):
+        pp_words[i] = pp_words[i].lower()
 
     return pd_words, pp_words
 
