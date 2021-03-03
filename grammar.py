@@ -7,7 +7,8 @@ import nltk
 def checkGrammar_KLP7(text):
 
     # preparation (convert to string, generate pos-tags and change all text to lowercase)
-    text = str(text)
+    text = "Walk to the corner, turn right, and cross the road. I took the gold."
+    text = ". " + str(text)
     pos_text = nltk.pos_tag(nltk.word_tokenize(text))
     print(pos_text)
 
@@ -58,10 +59,10 @@ def checkGrammar_KLP7(text):
         print('possessive determiners' + ': NO')
     print()
 
-
     # have to
-    # some/any
+
     # Mengenangaben
+
     # present progressive
 
     # simple past
