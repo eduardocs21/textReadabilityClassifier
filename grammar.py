@@ -2,15 +2,20 @@ import re
 from re import Pattern, Match
 import nltk
 # nltk.download('averaged_perceptron_tagger')
+from nltk.parse import CoreNLPParser, CoreNLPDependencyParser
+
 
 
 def checkGrammar_KLP7(text):
 
     # preparation (convert to string, generate pos-tags and change all text to lowercase)
-    text = "Walk to the corner, turn right, and cross the road. I took the gold."
-    text = ". " + str(text)
+    text = "I have been struggling in these times. He had been cooking all night. We will have been fighting for our lives."
+    text = str(text)
     pos_text = nltk.pos_tag(nltk.word_tokenize(text))
     print(pos_text)
+    dep_parser = CoreNLPDependencyParser(url='http://localhost:9000')
+    parses = dep_parser.parse(text.split())
+    print([[(governor, dep, dependent) for governor, dep, dependent in parse.triples()] for parse in parses])
 
 # 1)
     # plural of nouns
@@ -83,6 +88,7 @@ def checkGrammar_KLP7(text):
     else:
         print('possessive pronouns' + ': NO')
     print()
+
 
 
 
