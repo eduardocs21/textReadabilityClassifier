@@ -4,21 +4,43 @@ import nltk
 # nltk.download('averaged_perceptron_tagger')
 from nltk.parse import CoreNLPParser, CoreNLPDependencyParser
 
+# variables tense aspects
+# abbreviations: fu = future, pa = past, pre = present
+#               pro = progressive, per = perfect, si = simple, gt = going-to, part = participle
+fu_si = []
+fu_gt = []
+
+pre_per = []
+pa_per = []
+fu_per = []
+
+pre_pro = []
+pa_pro = []
+fu_pro = []
+
+pre_part = []
+pa_part = []
+gerund = []
+
+pre_per_pro = []
+pa_per_pro = []
+fu_per_pro = []
 
 
-def checkGrammar_KLP7(text):
-
+def check_grammar_klp7(text):
     # preparation (convert to string, generate pos-tags and change all text to lowercase)
     text = "Singing is my hobby. I love singing."
     text = str(text)
     pos_text = nltk.pos_tag(nltk.word_tokenize(text))
-    print(pos_text)
+    print("POS-Tags: " + str(pos_text))
     dep_parser = CoreNLPDependencyParser(url='http://localhost:9000')
-    parses = dep_parser.parse(text.split())
-    print([[(governor, dep, dependent) for governor, dep, dependent in parse.triples()] for parse in parses])
-    print()
+    parsed_text = dep_parser.parse(text.split())
+    print("Dependency Parsing: " + str(
+        [[(governor, dep, dependent) for governor, dep, dependent in parse.triples()] for parse in parsed_text]))
+    print("---")
+    print("Results:")
 
-# 1)
+    # 1)
     # plural of nouns
     print(search_postags(pos_text, ['NNS', 'NNPS'], "plural of nouns"))
     print()
@@ -35,7 +57,7 @@ def checkGrammar_KLP7(text):
     print(search_postags(pos_text, ['JJR', 'JJS', 'RBR', 'RBS'], "comparative adjectives (and adverbs)"))
     print()
 
-# 2)
+    # 2)
     # personal pronouns
     # print(search('personal pronouns', ['i', 'you', 'he', 'she', 'it', 'we', 'they'], text.lower()))
     print(search_postags(pos_text, ['PRP'], "personal pronoun"))
@@ -70,6 +92,8 @@ def checkGrammar_KLP7(text):
     # Mengenangaben
 
     # present progressive
+    search_tense_aspects(parsed_text)
+    print(fu_gt)
 
     # simple past
     print(search_postags(pos_text, ['VBD'], "simple past"))
@@ -91,20 +115,8 @@ def checkGrammar_KLP7(text):
     print()
 
 
-
-
-def checkGrammar_KLP9():
+def check_grammar_klp9():
     print('checking')
-
-
-def search(name, search_terms, text):
-    count = 0
-    for pp in search_terms:
-        x = re.findall(pp, text)
-        if x:
-            print(pp + str(len(x)))
-
-    return count
 
 
 def search_postags(pos_text, pos_tags, name):
@@ -149,7 +161,7 @@ def search_possessive_pronouns(pos_text):
 
             # separate special cases (its and his) by checking if following word is a noun
             else:
-                if pos_text[i+1][1] == ('NN' or 'NNS' or 'NNP' or 'NNPS'):
+                if pos_text[i + 1][1] == ('NN' or 'NNS' or 'NNP' or 'NNPS'):
                     pd_words.append(word[0])
                 else:
                     pp_words.append(word[0])
@@ -163,4 +175,15 @@ def search_possessive_pronouns(pos_text):
     return pd_words, pp_words
 
 
+def search_tense_aspects(parsed_text):
+    # search every occurrence of every tense aspect in the text and save it in a list
+    # form (example): return [ [], ["walking", "climbing"], [], [], ["formed", "sung", "taken"]]
+    # abbreviations: fu = future, pa = past, pre = present
+    #               pro = progressive, per = perfect, si = simple, gt = going-to, part = participle
+
+    print("BOOOM")
+    print(type(parsed_text))
+    for parse in parsed_text:
+        for x, y, z in parse:
+            print(x, y, z)
 
