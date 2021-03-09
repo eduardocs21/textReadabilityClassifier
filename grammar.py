@@ -37,12 +37,14 @@ def check_grammar_klp7(raw_text):
     global text
     global pos_text
     global parsed_text
-    # raw_text = "Singing is my hobby. I love singing."
+
     text = str(raw_text)
     pos_text = nltk.pos_tag(nltk.word_tokenize(raw_text))
     print("POS-Tags: " + str(pos_text))
     dep_parser = CoreNLPDependencyParser(url='http://localhost:9000')
-    parsed_text = dep_parser.parse(text.split())
+    parsed_text = list(dep_parser.parse(text.split()))
+    parsed_text = list(parsed_text)
+
     print("Dependency Parsing: " + str(
         [[(governor, dep, dependent) for governor, dep, dependent in parse.triples()] for parse in parsed_text]))
     print("---")
@@ -187,16 +189,59 @@ def search_tense_aspects():
     # form (example): pre_pro = ["walking", "climbing"], pa_par = ["formed", "sung", "taken"]]
     # abbreviations: fu = future, pa = past, pre = present
     #               pro = progressive, per = perfect, si = simple, gt = going-to, part = participle
+    # save sentence boundaries to check sentence context for more complicated distinctions, f.i. between
+    #   'will be doing' (fu_pro) and 'will have been doing' (fu_per_pro)
 
-    print(text)
+    print('TENSE ASPECTS:')
     for parse in parsed_text:
-        for x, y, z in parse.triples():
-            print(x)
 
-    print("POS-Tags: " + str(pos_text))
+        # calculate sentence boundaries to have a scope for later distinction searches
+        sentences_start_indexes = []
+        for x in range(0, len(list(parse.triples()))):
+            governor, dep, dependent = list(parse.triples())[x]
+            if dep == 'punct':
+                sentences_start_indexes.append(x)
 
-    print("Dependency Parsing: " + str(
-        [[(governor, dep, dependent) for governor, dep, dependent in parse.triples()] for parse in parsed_text]))
+        for governor, dep, dependent in parse.triples():
+            t1 = governor[1]
+            w2 = dependent[0]
+            if dep == 'aux':
+                # future simple / will-future
+                if (t1 == 'VB' or t1 == 'JJ') and (w2 == 'will' or w2 == 'wo'):
+                    fu_si.append(dependent[0] + " " + governor[0])
+                # present participle ("-ing")
+                elif t1 == 'VBG':
+                    # present progressive
+                    if w2 == 'am' or w2 == 'are' or w2 == 'is':
+                        pre_pro.append(w2 + " " + governor[0])
+                    # past progressive
+                    elif w2 == 'was' or w2 == 'were':
+                        pa_pro.append(w2 + " " + governor[0])
+                    # future progressive
+                    elif w2 == 'will' or w2 == 'wo':
+                        # sentence_end = list(parse.triples())[1].index("'punct'", sentence_start)
+                        fu_pro.append(w2 + " be " + governor[0])
 
-    print([[(governor, dep, dependent) for governor, dep, dependent in parse.triples()] for parse in parsed_text])
+            # update sentence_start (index) if necessary
+            # elif dep == 'punct':
+                # sentence_start = list(parse.triples()).index((governor, dep, dependent), sentence_start)
+                # print(sentence_start)
+
+    # difference parses will be counted up for higher precision, therefore numbers won´t be accurate in this case
+    # a warning follows:
+    if len(parsed_text) > 1:
+        print("WARNING: Tense aspect numbers aren't accurate since the text dependencies are ambiguous "
+              "(according to Stanford Core NLP")
+
+    print(fu_si)
+    print(pre_pro)
+    print(pa_pro)
+    print(fu_pro)
+    print()
+
+
+
+
+
+
 
