@@ -210,7 +210,6 @@ def search_tense_aspects():
 
             tag1 = parses_list[i][0][1]
             word1 = parses_list[i][0][0]
-            tag2 = parses_list[i][2][1]
             word2 = parses_list[i][2][0]
             dep = parses_list[i][1]
 
@@ -260,13 +259,24 @@ def search_tense_aspects():
                         gerund.append(word1)
                 # past participle ("-ed")
                 elif tag1 == 'VBN':
-                    # past participle (with noun)
+                    # past perfect
                     if word2 == 'had':
                         pa_per.append(word2 + " " + word1)
-                    elif word2 == 'will':
-                        fu_per.append("will have " + word1)
-                    else:
-                        pre_per.append("have/has " + word1)
+                    # present perfect and future perfect
+                    elif word2 == 'has':
+                        pre_per.append(word2 + " " + word1)
+                    elif word2 == 'have':
+                        not_identified = True
+                        for j in range(sentence_start + 1, len(parses_list)):
+                            if parses_list[j][1] == 'punct':
+                                break
+                            if parses_list[j][2][0] == 'will':
+                                fu_per.append('will ' + word2 + " " + word1)
+                                not_identified = False
+                                break
+                        if not_identified:
+                            pre_per.append(word2 + " " + word1)
+
 
             # update sentence_start (index) if necessary
             elif dep == 'punct':
