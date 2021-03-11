@@ -195,37 +195,82 @@ def search_tense_aspects():
     print('TENSE ASPECTS:')
     for parse in parsed_text:
 
-        # calculate sentence boundaries to have a scope for later distinction searches
-        sentences_start_indexes = []
-        for x in range(0, len(list(parse.triples()))):
-            governor, dep, dependent = list(parse.triples())[x]
-            if dep == 'punct':
-                sentences_start_indexes.append(x)
+        parses_list = list(parse.triples())
+        sentence_start = 0
 
-        for governor, dep, dependent in parse.triples():
-            t1 = governor[1]
-            w2 = dependent[0]
+        # calculate sentence boundaries to have a scope for later distinction searches
+        # sentences_start_indexes = []
+        # for x in range(0, len(parses_list)):
+        #     governor, dep, dependent = parses_list[x]
+        #     if dep == 'punct':
+        #         sentences_start_indexes.append(x)
+
+        # identify dependency parses for tense aspects in the text and save it in the according list
+        for i in range(0, len(parses_list)):
+
+            tag1 = parses_list[i][0][1]
+            word1 = parses_list[i][0][0]
+            tag2 = parses_list[i][2][1]
+            word2 = parses_list[i][2][0]
+            dep = parses_list[i][1]
+
             if dep == 'aux':
                 # future simple / will-future
-                if (t1 == 'VB' or t1 == 'JJ') and (w2 == 'will' or w2 == 'wo'):
-                    fu_si.append(dependent[0] + " " + governor[0])
-                # present participle ("-ing")
-                elif t1 == 'VBG':
+                if (tag1 == 'VB' or tag1 == 'JJ') and (word2 == 'will' or word2 == 'wo'):
+                    fu_si.append(word2 + " " + word1)
+                # present participle: ("-ing")
+                elif tag1 == 'VBG':
                     # present progressive
-                    if w2 == 'am' or w2 == 'are' or w2 == 'is':
-                        pre_pro.append(w2 + " " + governor[0])
+                    if word2 == 'am' or word2 == 'are' or word2 == 'is':
+                        pre_pro.append(word2 + " " + word1)
                     # past progressive
-                    elif w2 == 'was' or w2 == 'were':
-                        pa_pro.append(w2 + " " + governor[0])
+                    elif word2 == 'was' or word2 == 'were':
+                        pa_pro.append(word2 + " " + word1)
                     # future progressive
-                    elif w2 == 'will' or w2 == 'wo':
-                        # sentence_end = list(parse.triples())[1].index("'punct'", sentence_start)
-                        fu_pro.append(w2 + " be " + governor[0])
+                    elif word2 == 'will' or word2 == 'wo':
+                        # search for additional keyword "be" with dependency to word1 until sentence ends
+                        for j in range(sentence_start + 1, len(parses_list)):
+                            if parses_list[j][1] == 'punct':
+                                break
+                            if parses_list[j][2][0] == 'be':
+                                fu_pro.append(word2 + " be " + word1)
+                                break
+                    # present/past/future prefect progressive
+                    elif word2 == 'been':
+                        not_identified = True
+                        for j in range(sentence_start + 1, len(parses_list)):
+                            if parses_list[j][1] == 'punct':
+                                break
+                            if parses_list[j][2][0] == 'have' or parses_list[j][2][0] == 'has':
+                                for k in range(sentence_start + 1, len(parses_list)):
+                                    if parses_list[k][1] == 'punct':
+                                        break
+                                    if parses_list[k][2][0] == 'will':
+                                        fu_per_pro.append("will have " + word2 + " " + word1)
+                                        not_identified = False
+                                        break
+                                if not_identified:
+                                    pre_per_pro.append("have/has " + word2 + " " + word1)
+                                    not_identified = False
+                                break
+                        if not_identified:
+                            pa_per_pro.append("had " + word2 + " " + word1)
+                    # gerund 1
+                    else:
+                        gerund.append(word1)
+                # past participle ("-ed")
+                elif tag1 == 'VBN':
+                    # past participle (with noun)
+                    if word2 == 'had':
+                        pa_per.append(word2 + " " + word1)
+                    elif word2 == 'will':
+                        fu_per.append("will have " + word1)
+                    else:
+                        pre_per.append("have/has " + word1)
 
             # update sentence_start (index) if necessary
-            # elif dep == 'punct':
-                # sentence_start = list(parse.triples()).index((governor, dep, dependent), sentence_start)
-                # print(sentence_start)
+            elif dep == 'punct':
+                sentence_start = i
 
     # difference parses will be counted up for higher precision, therefore numbers won´t be accurate in this case
     # a warning follows:
@@ -237,11 +282,10 @@ def search_tense_aspects():
     print(pre_pro)
     print(pa_pro)
     print(fu_pro)
+    print(pre_per_pro)
+    print(pa_per_pro)
+    print(fu_per_pro)
+    print(pre_per)
+    print(pa_per)
+    print(fu_per)
     print()
-
-
-
-
-
-
-
