@@ -20,6 +20,7 @@ fu_pro = []
 
 pre_part = []
 pa_part = []
+per_part = []
 gerund = []
 
 pre_per_pro = []
@@ -210,6 +211,7 @@ def search_tense_aspects():
 
             tag1 = parses_list[i][0][1]
             word1 = parses_list[i][0][0]
+            tag2 = parses_list[i][2][1]
             word2 = parses_list[i][2][0]
             dep = parses_list[i][1]
 
@@ -234,7 +236,7 @@ def search_tense_aspects():
                             if parses_list[j][2][0] == 'be':
                                 fu_pro.append(word2 + " be " + word1)
                                 break
-                    # present/past/future prefect progressive
+                    # present/past/future perfect progressive
                     elif word2 == 'been':
                         not_identified = True
                         for j in range(sentence_start + 1, len(parses_list)):
@@ -276,7 +278,22 @@ def search_tense_aspects():
                                 break
                         if not_identified:
                             pre_per.append(word2 + " " + word1)
+                    # perfect participle ("having" + PP)
+                    elif tag2 == 'VBG':
+                        per_part.append(word2 + " " + word1)
+                    else:
+                        pa_part.append(word1)
 
+            # Past participle as adjective (participle phrase)
+            # elif dep == 'amod' and tag2 == 'VBN':
+            #    pa_part.append(word2 + " " + word1)
+
+            # Present participle as adjective (participle phrase) or gerund
+            elif str(word1).endswith('ing') and tag2 == 'NN':
+                if dep == 'nsubj':
+                    gerund.append(word2 + " " + word1)
+                elif dep == 'compound':
+                    pre_part.append(word2)
 
             # update sentence_start (index) if necessary
             elif dep == 'punct':
@@ -298,4 +315,14 @@ def search_tense_aspects():
     print(pre_per)
     print(pa_per)
     print(fu_per)
+    print(pre_part)
+    print(pa_part)
+    print(per_part)
+    print()
+
+    for parse in parsed_text:
+        for x, dep, y in parse.triples():
+            if dep == 'aux:pass':
+                print(x, dep, y)
+
     print()
