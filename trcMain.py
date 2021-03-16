@@ -72,3 +72,5 @@ for file in os.listdir(test_dirPath):
 
     # grammar checking of new data
     grammar.check_grammar_klp7(text)
+    grammar.check_grammar_klp9()
+

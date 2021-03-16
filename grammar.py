@@ -27,6 +27,8 @@ pre_per_pro = []
 pa_per_pro = []
 fu_per_pro = []
 
+passive = []
+
 # basic data
 text: str
 pos_text: list
@@ -126,7 +128,8 @@ def check_grammar_klp7(raw_text):
 
 
 def check_grammar_klp9():
-    print('checking')
+    print('KLP9')
+    print(search_passive())
 
 
 def search_postags(pos_tags, name):
@@ -199,13 +202,6 @@ def search_tense_aspects():
         parses_list = list(parse.triples())
         sentence_start = 0
 
-        # calculate sentence boundaries to have a scope for later distinction searches
-        # sentences_start_indexes = []
-        # for x in range(0, len(parses_list)):
-        #     governor, dep, dependent = parses_list[x]
-        #     if dep == 'punct':
-        #         sentences_start_indexes.append(x)
-
         # identify dependency parses for tense aspects in the text and save it in the according list
         for i in range(0, len(parses_list)):
 
@@ -215,39 +211,78 @@ def search_tense_aspects():
             word2 = parses_list[i][2][0]
             dep = parses_list[i][1]
 
-            if dep == 'aux':
+            # Update sentence_start (index) if necessary
+            if dep == 'punct' or dep == 'nsubj' or dep == 'csubj' or \
+                    dep == 'nsubj:pass' or dep == 'csubj:pass':
+                sentence_start = i
+
+            elif dep == 'aux':
                 # future simple / will-future
-                if (tag1 == 'VB' or tag1 == 'JJ') and (word2 == 'will' or word2 == 'wo'):
+                if (tag1 == 'VB' or tag1 == 'JJ') and (word2 == 'will' or word2 == 'wo' or word2 == "'ll"):
                     fu_si.append(word2 + " " + word1)
                 # present participle: ("-ing")
                 elif tag1 == 'VBG':
-                    # present progressive
-                    if word2 == 'am' or word2 == 'are' or word2 == 'is':
-                        pre_pro.append(word2 + " " + word1)
+                    # present progressive and going-to future and one passive form (to be + having + VBN)
+                    if word2 == 'am' or word2 == 'are' or word2 == 'is' or word2 == "'m" or word2 == "'re":
+                        not_identified = True
+                        if word1 == 'going':
+                            # search for additional xcomp VB with dependency to word1 until sentence part ends
+                            for j in range(sentence_start + 1, len(parses_list)):
+                                dep = parses_list[j][1]
+                                if dep == 'punct' or dep == 'nsubj' or dep == 'csubj' or \
+                                        dep == 'nsubj:pass' or dep == 'csubj:pass':
+                                    break
+                                if dep == 'xcomp' and parses_list[j][2][1] == 'VB':
+                                    fu_gt.append(word2 + " " + word1 + " to " + parses_list[j][2][0])
+                                    not_identified = False
+                                    break
+                        elif word1 == 'having':
+                            # search for additional ccomp VBN with dependency to word1 until sentence part ends
+                            for j in range(sentence_start + 1, len(parses_list)):
+                                dep = parses_list[j][1]
+                                if dep == 'punct' or dep == 'nsubj' or dep == 'csubj' or \
+                                        dep == 'nsubj:pass' or dep == 'csubj:pass':
+                                    break
+                                if dep == 'ccomp' and parses_list[j][2][1] == 'VBN':
+                                    passive.append(word2 + " " + word1 + " (obj) " + parses_list[j][2][0])
+                                    not_identified = False
+                                    break
+                        if not_identified:
+                            pre_pro.append(word2 + " " + word1)
                     # past progressive
                     elif word2 == 'was' or word2 == 'were':
                         pa_pro.append(word2 + " " + word1)
                     # future progressive
-                    elif word2 == 'will' or word2 == 'wo':
-                        # search for additional keyword "be" with dependency to word1 until sentence ends
+                    elif word2 == 'will' or word2 == 'wo' or word2 == "'ll":
+                        # search for additional keyword "be" with dependency to word1 until sentence part ends
                         for j in range(sentence_start + 1, len(parses_list)):
-                            if parses_list[j][1] == 'punct':
+                            dep = parses_list[j][1]
+                            if dep == 'punct' or dep == 'nsubj' or dep == 'csubj' or \
+                                    dep == 'nsubj:pass' or dep == 'csubj:pass':
                                 break
-                            if parses_list[j][2][0] == 'be':
+                            if parses_list[j][2][0] == 'be' and parses_list[j][0][0] == word1:
                                 fu_pro.append(word2 + " be " + word1)
                                 break
                     # present/past/future perfect progressive
                     elif word2 == 'been':
                         not_identified = True
+                        # search for additional keyword "have" with dependency to word1 until sentence part ends
                         for j in range(sentence_start + 1, len(parses_list)):
-                            if parses_list[j][1] == 'punct':
+                            dep = parses_list[j][1]
+                            if dep == 'punct' or dep == 'nsubj' or dep == 'csubj' or \
+                                    dep == 'nsubj:pass' or dep == 'csubj:pass':
                                 break
-                            if parses_list[j][2][0] == 'have' or parses_list[j][2][0] == 'has':
+                            if parses_list[j][2][0] == 'have' or parses_list[j][2][0] == 'has' \
+                                    or parses_list[j][2][0] == "'ve":
+                                # search for additional keyword "will" with dependency to word1 until sentence part ends
                                 for k in range(sentence_start + 1, len(parses_list)):
-                                    if parses_list[k][1] == 'punct':
+                                    dep = parses_list[k][1]
+                                    if dep == 'punct' or dep == 'nsubj' or dep == 'csubj' or \
+                                            dep == 'nsubj:pass' or dep == 'csubj:pass':
                                         break
-                                    if parses_list[k][2][0] == 'will':
-                                        fu_per_pro.append("will have " + word2 + " " + word1)
+                                    if parses_list[k][2][0] == 'will' or parses_list[k][2][0] == 'wo' \
+                                            or parses_list[k][2][0] == "'ll":
+                                        fu_per_pro.append("will/won't have " + word2 + " " + word1)
                                         not_identified = False
                                         break
                                 if not_identified:
@@ -256,9 +291,7 @@ def search_tense_aspects():
                                 break
                         if not_identified:
                             pa_per_pro.append("had " + word2 + " " + word1)
-                    # gerund 1
-                    else:
-                        gerund.append(word1)
+
                 # past participle ("-ed")
                 elif tag1 == 'VBN':
                     # past perfect
@@ -267,13 +300,17 @@ def search_tense_aspects():
                     # present perfect and future perfect
                     elif word2 == 'has':
                         pre_per.append(word2 + " " + word1)
-                    elif word2 == 'have':
+                    elif word2 == 'have' or word2 == "'ve":
                         not_identified = True
+                        # search for additional keyword "will" with dependency to word1 until sentence part ends
                         for j in range(sentence_start + 1, len(parses_list)):
-                            if parses_list[j][1] == 'punct':
+                            dep = parses_list[j][1]
+                            if dep == 'punct' or dep == 'nsubj' or dep == 'csubj' or \
+                                    dep == 'nsubj:pass' or dep == 'csubj:pass':
                                 break
-                            if parses_list[j][2][0] == 'will':
-                                fu_per.append('will ' + word2 + " " + word1)
+                            if parses_list[j][2][0] == 'will' or parses_list[j][2][0] == 'wo' \
+                                    or parses_list[j][2][0] == "'ll":
+                                fu_per.append("will/won't " + word2 + " " + word1)
                                 not_identified = False
                                 break
                         if not_identified:
@@ -281,23 +318,66 @@ def search_tense_aspects():
                     # perfect participle ("having" + PP)
                     elif tag2 == 'VBG':
                         per_part.append(word2 + " " + word1)
-                    else:
+
+            # gerund
+            elif str(word2).endswith('ing') and tag2 == 'NN' and dep == 'obj':
+                gerund.append(word1 + " " + word2)
+
+            # present participle (other) - case 1
+            elif tag1 == 'VBG':
+                # if the VBG-verb doesnt have an auxiliary, it's not recognized above, but still a present participle
+                # and therefore added to the "present participle (other)" list pre_part
+                for j in range(sentence_start + 1, len(parses_list)):
+                    dep = parses_list[j][1]
+                    if dep == 'punct' or dep == 'nsubj' or dep == 'csubj' or \
+                            dep == 'nsubj:pass' or dep == 'csubj:pass':
+                        break
+                    if not (dep == 'aux' and parses_list[j][0][0] == word1):
+                        pre_part.append(word1)
+                        break
+
+            # present participle (other) - case 2
+            elif tag2 == 'VBG':
+                # if the VBG-verb doesnt have an auxiliary, it's not recognized above, but still a present participle
+                # and therefore added to the "present participle (other)" list pre_part
+                for j in range(sentence_start + 1, len(parses_list)):
+                    dep = parses_list[j][1]
+                    if dep == 'punct' or dep == 'nsubj' or dep == 'csubj' or \
+                            dep == 'nsubj:pass' or dep == 'csubj:pass':
+                        break
+                    if not (dep == 'aux' and parses_list[j][2][0] == word2):
+                        pre_part.append(word2)
+                        break
+
+            # past participle (other) - case 1
+            elif tag1 == 'VBN':
+                # if the VBG-verb doesnt have an auxiliary, it's not recognized above, but still a present participle
+                # and therefore added to the "present participle (other)" list pre_part
+                for j in range(sentence_start + 1, len(parses_list)):
+                    dep = parses_list[j][1]
+                    if dep == 'punct' or dep == 'nsubj' or dep == 'csubj' or \
+                            dep == 'nsubj:pass' or dep == 'csubj:pass':
+                        break
+                    if not (dep == 'aux' and parses_list[j][0][0] == word1):
                         pa_part.append(word1)
+                        break
 
-            # Past participle as adjective (participle phrase)
-            # elif dep == 'amod' and tag2 == 'VBN':
-            #    pa_part.append(word2 + " " + word1)
+            # past participle (other) - case 2
+            elif tag2 == 'VBN':
+                # if the VBG-verb doesnt have an auxiliary, it's not recognized above, but still a present participle
+                # and therefore added to the "present participle (other)" list pre_part
+                for j in range(sentence_start + 1, len(parses_list)):
+                    dep = parses_list[j][1]
+                    if dep == 'punct' or dep == 'nsubj' or dep == 'csubj' or \
+                            dep == 'nsubj:pass' or dep == 'csubj:pass':
+                        break
+                    if not (dep == 'aux' and parses_list[j][2][0] == word2):
+                        pa_part.append(word2)
+                        break
 
-            # Present participle as adjective (participle phrase) or gerund
-            elif str(word1).endswith('ing') and tag2 == 'NN':
-                if dep == 'nsubj':
-                    gerund.append(word2 + " " + word1)
-                elif dep == 'compound':
-                    pre_part.append(word2)
-
-            # update sentence_start (index) if necessary
-            elif dep == 'punct':
-                sentence_start = i
+            # passive
+            elif dep == 'aux:pass':
+                passive.append(word2 + " " + word1)
 
     # difference parses will be counted up for higher precision, therefore numbers won´t be accurate in this case
     # a warning follows:
@@ -306,6 +386,7 @@ def search_tense_aspects():
               "(according to Stanford Core NLP")
 
     print(fu_si)
+    print(fu_gt)
     print(pre_pro)
     print(pa_pro)
     print(fu_pro)
@@ -318,11 +399,19 @@ def search_tense_aspects():
     print(pre_part)
     print(pa_part)
     print(per_part)
+    print(gerund)
     print()
 
+
+def search_passive():
     for parse in parsed_text:
-        for x, dep, y in parse.triples():
+        for governor, dep, dependent in parse.triples():
             if dep == 'aux:pass':
-                print(x, dep, y)
+                passive.append(dependent[0] + " " + governor[0])
 
-    print()
+    if passive:
+        print('Passive: YES --- Details:')
+    else:
+        print('Passive: NO')
+
+    return passive
