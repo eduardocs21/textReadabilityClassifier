@@ -35,7 +35,7 @@ pos_text: list
 parsed_text: list
 
 
-def check_grammar_klp7(raw_text):
+def check_grammar(raw_text):
     # preparation (convert to string, generate and print pos-tags and dependency parses)
     global text
     global pos_text
@@ -46,7 +46,22 @@ def check_grammar_klp7(raw_text):
     print("POS-Tags: " + str(pos_text))
     dep_parser = CoreNLPDependencyParser(url='http://localhost:9000')
     parsed_text = list(dep_parser.parse(text.split()))
-    parsed_text = list(parsed_text)
+
+    # tense aspects
+    search_tense_aspects()
+
+    # TODO: sentence parsing
+    # sentences = text.split('. ')
+    # sentences_token_list = []
+    # for sentence in sentences:
+    #     sentences_token_list.append(sentence.split())
+    #
+    # parsed_sentences = list(dep_parser.parse_sents(sentences_token_list))
+    # for x in parsed_sentences:
+    #     for y in x:
+    #         print(y)
+    #         break
+    #     break
 
     print("Dependency Parsing: " + str(
         [[(governor, dep, dependent) for governor, dep, dependent in parse.triples()] for parse in parsed_text]))
@@ -58,12 +73,12 @@ def check_grammar_klp7(raw_text):
     print(search_postags(['NNS', 'NNPS'], "plural of nouns"))
     print()
 
-    # s-genitive
-    print(search_postags(['POS'], "possessive ending (s-Genitiv)"))
+    # possessive ending (s-genitive)
+    print(search_postags(['POS'], "possessive ending (s-genitive)"))
     print()
 
     # adverbs (of frequency)
-    print(search_postags(['RB'], "adverbs"))
+    print(search_postags(['RB'], "adverbs and negations"))
     print()
 
     # comparative adjectives and adverbs
@@ -72,7 +87,6 @@ def check_grammar_klp7(raw_text):
 
     # 2)
     # personal pronouns
-    # print(search('personal pronouns', ['i', 'you', 'he', 'she', 'it', 'we', 'they'], text.lower()))
     print(search_postags(['PRP'], "personal pronoun"))
     print()
 
@@ -80,11 +94,11 @@ def check_grammar_klp7(raw_text):
     print(search_postags(['MD'], "modal verbs"))
     print()
 
-    # imperatives
+    # TODO imperatives
 
-    # have got
+    # TODO have got
 
-    # there + be
+    # TODO there + be
 
     # possessive determiners (different to absolute possessive pronouns)
     poss_det, poss_pro = search_possessive_pronouns()
@@ -100,20 +114,6 @@ def check_grammar_klp7(raw_text):
         print('possessive determiners' + ': NO')
     print()
 
-    # have to
-
-    # Mengenangaben
-
-    # present progressive
-    search_tense_aspects()
-
-    # simple past
-    print(search_postags(['VBD'], "simple past"))
-    print()
-
-    # this/that/these/those
-    # word order subordinate clause
-
     # possessive pronouns (different to possessive determiners)
     # if there are matches, print it out and return a dictionary containing word frequencies
     if poss_pro:
@@ -126,10 +126,99 @@ def check_grammar_klp7(raw_text):
         print('possessive pronouns' + ': NO')
     print()
 
+    # TODO have to
 
-def check_grammar_klp9():
+    # present progressive
+    if pre_pro:
+        print("present progressive: YES --- Details:")
+        print(pre_pro)
+    else:
+        print("present progressive: NO")
+    print()
+
+    # simple past
+    print(search_postags(['VBD'], "simple past"))
+    print()
+
+    # TODO conditional clauses
+
+    # present progressive
+    if pre_pro:
+        print("present progressive: YES --- Details:")
+        print(pre_pro)
+    else:
+        print("present progressive: NO")
+    print()
+
+    # present perfect
+    if pre_per:
+        print("present perfect: YES --- Details:")
+        print(pre_per)
+        print()
+    else:
+        print("present perfect: NO")
+        print()
+
+    # future simple (will-future)
+    if fu_si:
+        print("future simple (will-future): YES --- Details:")
+        print(fu_si)
+    else:
+        print("future simple (will-future): NO")
+    print()
+
+    # going-to-future
+    if fu_gt:
+        print("going-to-future: YES --- Details:")
+        print(fu_gt)
+    else:
+        print("going-to-future: NO")
+    print()
+
+    # KLP9
+    print('-----')
     print('KLP9')
-    print(search_passive())
+    print('-----')
+
+    # past progressive
+    if pa_pro:
+        print("past progressive: YES --- Details:")
+        print(pa_pro)
+    else:
+        print("past progressive: NO")
+    print()
+
+    # past perfect
+    if pa_per:
+        print("past perfect: YES --- Details:")
+        print(pa_per)
+    else:
+        print("past perfect: NO")
+    print()
+
+    # gerund
+    if gerund:
+        print("gerund: YES --- Details:")
+        print(gerund)
+    else:
+        print("gerund: NO")
+    print()
+
+    # TODO since/for
+
+    # passive
+    if passive:
+        print("passive: YES --- Details:")
+        print(passive)
+    else:
+        print("passive: NO")
+    print()
+
+    # TODO relative clauses
+
+    # TODO contact clauses
+
+    # TODO reflexive pronouns
 
 
 def search_postags(pos_tags, name):
@@ -161,13 +250,14 @@ def search_possessive_pronouns():
     pd_words = []
     pp_words = []
 
-    # search the text for personal pronouns and determiners and separate them
+    # search the text for possessive pronouns and determiners and separate them
     for i in range(0, len(pos_text)):
         word = pos_text[i]
         if word[1] == 'PRP$':
             w = word[0]
             # separate clear cases
-            if w == 'my' or w == 'your' or w == 'her' or w == 'our' or w == 'their':
+            if w == 'my':
+            # if w == ('my', 'your', 'her', 'our', 'their'):
                 pd_words.append(word[0])
             elif w == 'mine' or w == 'yours' or w == 'hers' or w == 'ours' or w == 'theirs':
                 pp_words.append(word[0])
@@ -196,7 +286,6 @@ def search_tense_aspects():
     # save sentence boundaries to check sentence context for more complicated distinctions, f.i. between
     #   'will be doing' (fu_pro) and 'will have been doing' (fu_per_pro)
 
-    print('TENSE ASPECTS:')
     for parse in parsed_text:
 
         parses_list = list(parse.triples())
@@ -215,6 +304,9 @@ def search_tense_aspects():
             if dep == 'punct' or dep == 'nsubj' or dep == 'csubj' or \
                     dep == 'nsubj:pass' or dep == 'csubj:pass':
                 sentence_start = i
+
+            elif dep == 'parataxis':
+                continue
 
             elif dep == 'aux':
                 # future simple / will-future
@@ -319,65 +411,51 @@ def search_tense_aspects():
                     elif tag2 == 'VBG':
                         per_part.append(word2 + " " + word1)
 
+            # passive
+            elif dep == 'aux:pass':
+                passive.append(word2 + " " + word1)
+
             # gerund
             elif str(word2).endswith('ing') and tag2 == 'NN' and dep == 'obj':
                 gerund.append(word1 + " " + word2)
 
-            # present participle (other) - case 1
-            elif tag1 == 'VBG':
+            # present participle (other)
+            elif tag1 == 'VBG' or tag2 == 'VBG':
+                pre_part_bool = True
+                word = word1
+                if tag2 == 'VBG':
+                    word = word2
                 # if the VBG-verb doesnt have an auxiliary, it's not recognized above, but still a present participle
                 # and therefore added to the "present participle (other)" list pre_part
                 for j in range(sentence_start + 1, len(parses_list)):
                     dep = parses_list[j][1]
-                    if dep == 'punct' or dep == 'nsubj' or dep == 'csubj' or \
-                            dep == 'nsubj:pass' or dep == 'csubj:pass':
+                    if dep == 'punct':
                         break
-                    if not (dep == 'aux' and parses_list[j][0][0] == word1):
-                        pre_part.append(word1)
+                    if (dep == 'aux' or dep == 'aux:pass') and (parses_list[j][0][0] == word or parses_list[j][2][0] == word):
+                        pre_part_bool = False
                         break
-
-            # present participle (other) - case 2
-            elif tag2 == 'VBG':
-                # if the VBG-verb doesnt have an auxiliary, it's not recognized above, but still a present participle
-                # and therefore added to the "present participle (other)" list pre_part
-                for j in range(sentence_start + 1, len(parses_list)):
-                    dep = parses_list[j][1]
-                    if dep == 'punct' or dep == 'nsubj' or dep == 'csubj' or \
-                            dep == 'nsubj:pass' or dep == 'csubj:pass':
-                        break
-                    if not (dep == 'aux' and parses_list[j][2][0] == word2):
-                        pre_part.append(word2)
-                        break
+                if pre_part_bool:
+                    pre_part.append(word)
 
             # past participle (other) - case 1
-            elif tag1 == 'VBN':
+            elif tag1 == 'VBN' or tag2 == 'VBN':
+                pa_part_bool = True
+                word = word1
+                if tag2 == 'VBN':
+                    word = word2
                 # if the VBG-verb doesnt have an auxiliary, it's not recognized above, but still a present participle
                 # and therefore added to the "present participle (other)" list pre_part
                 for j in range(sentence_start + 1, len(parses_list)):
                     dep = parses_list[j][1]
-                    if dep == 'punct' or dep == 'nsubj' or dep == 'csubj' or \
-                            dep == 'nsubj:pass' or dep == 'csubj:pass':
+                    if dep == 'punct':
                         break
-                    if not (dep == 'aux' and parses_list[j][0][0] == word1):
-                        pa_part.append(word1)
+                    if (dep == 'aux' or dep == 'aux:pass') and (parses_list[j][0][0] == word or parses_list[j][2][0] == word):
+                        pa_part_bool = False
                         break
+                if pa_part_bool:
+                    pa_part.append(word)
 
-            # past participle (other) - case 2
-            elif tag2 == 'VBN':
-                # if the VBG-verb doesnt have an auxiliary, it's not recognized above, but still a present participle
-                # and therefore added to the "present participle (other)" list pre_part
-                for j in range(sentence_start + 1, len(parses_list)):
-                    dep = parses_list[j][1]
-                    if dep == 'punct' or dep == 'nsubj' or dep == 'csubj' or \
-                            dep == 'nsubj:pass' or dep == 'csubj:pass':
-                        break
-                    if not (dep == 'aux' and parses_list[j][2][0] == word2):
-                        pa_part.append(word2)
-                        break
 
-            # passive
-            elif dep == 'aux:pass':
-                passive.append(word2 + " " + word1)
 
     # difference parses will be counted up for higher precision, therefore numbers won´t be accurate in this case
     # a warning follows:
@@ -385,33 +463,7 @@ def search_tense_aspects():
         print("WARNING: Tense aspect numbers aren't accurate since the text dependencies are ambiguous "
               "(according to Stanford Core NLP")
 
-    print(fu_si)
-    print(fu_gt)
-    print(pre_pro)
-    print(pa_pro)
-    print(fu_pro)
-    print(pre_per_pro)
-    print(pa_per_pro)
-    print(fu_per_pro)
-    print(pre_per)
-    print(pa_per)
-    print(fu_per)
-    print(pre_part)
-    print(pa_part)
-    print(per_part)
-    print(gerund)
-    print()
 
 
-def search_passive():
-    for parse in parsed_text:
-        for governor, dep, dependent in parse.triples():
-            if dep == 'aux:pass':
-                passive.append(dependent[0] + " " + governor[0])
 
-    if passive:
-        print('Passive: YES --- Details:')
-    else:
-        print('Passive: NO')
 
-    return passive
