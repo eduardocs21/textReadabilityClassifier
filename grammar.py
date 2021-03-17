@@ -42,10 +42,12 @@ def check_grammar(raw_text):
     global parsed_text
 
     text = str(raw_text)
-    pos_text = nltk.pos_tag(nltk.word_tokenize(raw_text))
+    pos_parser = CoreNLPParser(url='http://localhost:9000', tagtype='pos')
+    pos_text = pos_parser.tag(text.split())
     print("POS-Tags: " + str(pos_text))
     dep_parser = CoreNLPDependencyParser(url='http://localhost:9000')
     parsed_text = list(dep_parser.parse(text.split()))
+
 
     # tense aspects
     search_tense_aspects()
@@ -254,26 +256,21 @@ def search_possessive_pronouns():
     for i in range(0, len(pos_text)):
         word = pos_text[i]
         if word[1] == 'PRP$':
-            w = word[0]
+            w = word[0].lower()
             # separate clear cases
-            if w == 'my':
-            # if w == ('my', 'your', 'her', 'our', 'their'):
-                pd_words.append(word[0])
-            elif w == 'mine' or w == 'yours' or w == 'hers' or w == 'ours' or w == 'theirs':
-                pp_words.append(word[0])
+            # if w == 'my' or w == 'your' or w == 'her' or w == 'our' or w == 'their':
+            if w in ('my', 'your', 'her', 'our', 'their'):
+                pd_words.append(w)
+            elif w in ('mine', 'yours', 'hers', 'ours', 'theirs'):
+                pp_words.append(w)
 
             # separate special cases (its and his) by checking if following word is a noun
             else:
-                if pos_text[i + 1][1] == ('NN' or 'NNS' or 'NNP' or 'NNPS'):
-                    pd_words.append(word[0])
+                # TODO correct
+                if pos_text[i + 1][1] in ('NN', 'NNS', 'NNP', 'NNPS'):
+                    pd_words.append(w)
                 else:
-                    pp_words.append(word[0])
-
-    # to lowercase
-    for i in range(0, len(pd_words)):
-        pd_words[i] = pd_words[i].lower()
-    for i in range(0, len(pp_words)):
-        pp_words[i] = pp_words[i].lower()
+                    pp_words.append(w)
 
     return pd_words, pp_words
 
@@ -301,8 +298,7 @@ def search_tense_aspects():
             dep = parses_list[i][1]
 
             # Update sentence_start (index) if necessary
-            if dep == 'punct' or dep == 'nsubj' or dep == 'csubj' or \
-                    dep == 'nsubj:pass' or dep == 'csubj:pass':
+            if dep in ('punct', 'nsubj', 'csubj', 'nsubj:pass', 'csubj:pass'):
                 sentence_start = i
 
             elif dep == 'parataxis':
@@ -310,7 +306,7 @@ def search_tense_aspects():
 
             elif dep == 'aux':
                 # future simple / will-future
-                if (tag1 == 'VB' or tag1 == 'JJ') and (word2 == 'will' or word2 == 'wo' or word2 == "'ll"):
+                if (tag1 in ('VB', 'JJ')) and (word2 in ('will', 'wo', "'ll")):
                     fu_si.append(word2 + " " + word1)
                 # present participle: ("-ing")
                 elif tag1 == 'VBG':
