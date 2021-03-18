@@ -266,13 +266,17 @@ def search_possessive_pronouns():
 
             # separate special cases (its and his) by checking if following word is a noun
             else:
-                # TODO correct
                 if pos_text[i + 1][1] in ('NN', 'NNS', 'NNP', 'NNPS'):
                     pd_words.append(w)
                 else:
                     pp_words.append(w)
 
     return pd_words, pp_words
+
+
+# TODO write method for things like since/for (with module 're'?)
+def search_regex():
+    print()
 
 
 def search_tense_aspects():
@@ -450,8 +454,6 @@ def search_tense_aspects():
                         break
                 if pa_part_bool:
                     pa_part.append(word)
-
-
 
     # difference parses will be counted up for higher precision, therefore numbers won´t be accurate in this case
     # a warning follows:
