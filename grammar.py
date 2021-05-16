@@ -4,7 +4,7 @@ import nltk
 # nltk.download('averaged_perceptron_tagger')
 from nltk.parse import CoreNLPParser, CoreNLPDependencyParser
 
-# variables tense aspects
+# variables: tense aspects
 # abbreviations: fu = future, pa = past, pre = present
 #               pro = progressive, per = perfect, si = simple, gt = going-to, part = participle
 fu_si = []
@@ -41,6 +41,9 @@ def check_grammar(raw_text):
     global pos_text
     global parsed_text
 
+    raw_text = "I am not allowed to drive. He is able to work. They're not supposed to do this." \
+               "I have an idea. I have to do it."
+
     text = str(raw_text)
     pos_parser = CoreNLPParser(url='http://localhost:9000', tagtype='pos')
     pos_text = pos_parser.tag(text.split())
@@ -48,22 +51,20 @@ def check_grammar(raw_text):
     dep_parser = CoreNLPDependencyParser(url='http://localhost:9000')
     parsed_text = list(dep_parser.parse(text.split()))
 
-
     # tense aspects
     search_tense_aspects()
 
-    # TODO: sentence parsing
-    # sentences = text.split('. ')
-    # sentences_token_list = []
-    # for sentence in sentences:
-    #     sentences_token_list.append(sentence.split())
-    #
-    # parsed_sentences = list(dep_parser.parse_sents(sentences_token_list))
-    # for x in parsed_sentences:
-    #     for y in x:
-    #         print(y)
-    #         break
-    #     break
+    # TODO: sentence parsing (for improved tense detection approach?)
+    sentences = text.split('. ')
+    sentences_token_list = []
+    for sentence in sentences:
+        sentences_token_list.append(sentence.split())
+
+    parsed_sentences = list(dep_parser.parse_sents(sentences_token_list))
+    for x in parsed_sentences:
+        for y in x:
+            print(y)
+            break
 
     print("Dependency Parsing: " + str(
         [[(governor, dep, dependent) for governor, dep, dependent in parse.triples()] for parse in parsed_text]))
@@ -97,6 +98,7 @@ def check_grammar(raw_text):
     print()
 
     # TODO imperatives
+    # with parsed sentences: every VB that has no subject (dependencies: nsubj, csubj, nsubj:pass, csubj:pass)
 
     # TODO have got
 
@@ -128,8 +130,6 @@ def check_grammar(raw_text):
         print('possessive pronouns' + ': NO')
     print()
 
-    # TODO have to
-
     # present progressive
     if pre_pro:
         print("present progressive: YES --- Details:")
@@ -143,14 +143,6 @@ def check_grammar(raw_text):
     print()
 
     # TODO conditional clauses
-
-    # present progressive
-    if pre_pro:
-        print("present progressive: YES --- Details:")
-        print(pre_pro)
-    else:
-        print("present progressive: NO")
-    print()
 
     # present perfect
     if pre_per:
@@ -206,7 +198,21 @@ def check_grammar(raw_text):
         print("gerund: NO")
     print()
 
-    # TODO since/for
+    # present participle
+    if pre_part:
+        print("present participle: YES --- Details:")
+        print(pre_part)
+    else:
+        print("present participle: NO")
+    print()
+
+    # past participle
+    if pa_part:
+        print("past participle: YES --- Details:")
+        print(pa_part)
+    else:
+        print("past participle: NO")
+    print()
 
     # passive
     if passive:
@@ -221,6 +227,63 @@ def check_grammar(raw_text):
     # TODO contact clauses
 
     # TODO reflexive pronouns
+
+    # KLP11
+    print('-----')
+    print('KLP11')
+    print('-----')
+
+    # future progressive
+    if fu_pro:
+        print("future progressive: YES --- Details:")
+        print(fu_pro)
+    else:
+        print("future progressive: NO")
+    print()
+
+    # future perfect
+    if fu_per:
+        print("future perfect: YES --- Details:")
+        print(fu_per)
+    else:
+        print("future perfect: NO")
+    print()
+
+    # future perfect progressive
+    if fu_per_pro:
+        print("future perfect progressive: YES --- Details:")
+        print(fu_per_pro)
+    else:
+        print("future perfect progressive: NO")
+    print()
+
+    # advanced modal verbs
+    print(search_advanced_modal_verbs())
+    print()
+
+    # present perfect progressive
+    if pre_per_pro:
+        print("present perfect progressive: YES --- Details:")
+        print(pre_per_pro)
+    else:
+        print("present perfect progressive: NO")
+    print()
+
+    # past perfect progressive
+    if pa_per_pro:
+        print("past perfect progressive: YES --- Details:")
+        print(pa_per_pro)
+    else:
+        print("past perfect progressive: NO")
+    print()
+
+    # perfect participle
+    if per_part:
+        print("perfect participle: YES --- Details:")
+        print(per_part)
+    else:
+        print("perfect participle: NO")
+    print()
 
 
 def search_postags(pos_tags, name):
@@ -277,6 +340,23 @@ def search_possessive_pronouns():
 # TODO write method for things like since/for (with module 're'?)
 def search_regex():
     print()
+
+
+def search_advanced_modal_verbs():
+
+    result = re.findall('(allowed|have|has|had|able|supposed) to', text)
+    frequency = {}
+
+    if result:
+        print('Advanced modal verbs' + ': YES --- Details:')
+        for i in range(0, len(result)):
+            result[i] = result[i].lower()
+        for item in result:
+            frequency[item] = result.count(item)
+        return frequency
+
+    print('Advanced modal verbs' + ': NO')
+    return frequency
 
 
 def search_tense_aspects():
@@ -456,10 +536,10 @@ def search_tense_aspects():
                     pa_part.append(word)
 
     # difference parses will be counted up for higher precision, therefore numbers won´t be accurate in this case
-    # a warning follows:
+    # -> a warning follows:
     if len(parsed_text) > 1:
         print("WARNING: Tense aspect numbers aren't accurate since the text dependencies are ambiguous "
-              "(according to Stanford Core NLP")
+              "(according to Stanford Core NLP)")
 
 
 
