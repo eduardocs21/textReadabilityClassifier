@@ -42,7 +42,9 @@ def check_grammar(raw_text):
     global parsed_text
 
     raw_text = "I am not allowed to drive. He is able to work. They're not supposed to do this." \
-               "I have an idea. I have to do it."
+               "I have an idea. I have to do it. I hate myself. But I guess we got to do it ourselves. There's a" \
+               "tree over there. There is a new cafe in the centre of town which sells Indonesian food." \
+               "There’s a letter on your desk. Julia brought it from the mail room. There are three Japanese students in my class."
 
     text = str(raw_text)
     pos_parser = CoreNLPParser(url='http://localhost:9000', tagtype='pos')
@@ -99,10 +101,6 @@ def check_grammar(raw_text):
 
     # TODO imperatives
     # with parsed sentences: every VB that has no subject (dependencies: nsubj, csubj, nsubj:pass, csubj:pass)
-
-    # TODO have got
-
-    # TODO there + be
 
     # possessive determiners (different to absolute possessive pronouns)
     poss_det, poss_pro = search_possessive_pronouns()
@@ -226,7 +224,9 @@ def check_grammar(raw_text):
 
     # TODO contact clauses
 
-    # TODO reflexive pronouns
+    # reflexive pronouns
+    print(search_regex('reflexive pronouns', 'myself|yourself|herself|himself|ourselves|yourselves|themselves'))
+    print()
 
     # KLP11
     print('-----')
@@ -258,7 +258,7 @@ def check_grammar(raw_text):
     print()
 
     # advanced modal verbs
-    print(search_advanced_modal_verbs())
+    print(search_regex('Advanced Modal Verbs', '(allowed|have|has|had|able|supposed) to'))
     print()
 
     # present perfect progressive
@@ -338,24 +338,20 @@ def search_possessive_pronouns():
 
 
 # TODO write method for things like since/for (with module 're'?)
-def search_regex():
-    print()
+def search_regex(name, regex):
 
-
-def search_advanced_modal_verbs():
-
-    result = re.findall('(allowed|have|has|had|able|supposed) to', text)
+    result = re.findall(regex, text)
     frequency = {}
 
     if result:
-        print('Advanced modal verbs' + ': YES --- Details:')
+        print(name + ': YES --- Details:')
         for i in range(0, len(result)):
             result[i] = result[i].lower()
         for item in result:
             frequency[item] = result.count(item)
         return frequency
 
-    print('Advanced modal verbs' + ': NO')
+    print(name + ': NO')
     return frequency
 
 
