@@ -4,19 +4,26 @@ import nltk
 import os
 import svm_evaluation
 import grammar
+import vocabulary
+import re
 
 training_dirPath = 'training_data'
 test_dirPath = 'test_data'
+path_additional_vocabulary = 'vocabulary_data'
 numberOfFoldsForCrossVal = 10
+grade = 8
 
 data_metrics = []
 data_grades = []
+training_vocabulary = {"."}
 text: str
 
 
 def training_readability():
     # calculate scores for training data
     global text
+    global training_vocabulary
+
     for file in os.listdir(training_dirPath):
         with open(training_dirPath + '/' + file, encoding='utf-8') as f:
             text = f.read()
@@ -31,17 +38,24 @@ def training_readability():
         if textType == "song" or textType == "dialog" or textType == "cloze":
             continue
 
-        re = Readability(text)
+        readab = Readability(text)
 
         # calculate readability scores and save as data
         data_metrics.append(
-            [re.flesch_kincaid().score, re.flesch().score, re.gunning_fog().score, re.coleman_liau().score,
-             re.dale_chall().score, re.ari().score, re.linsear_write().score, re.spache().score])
+            [readab.flesch_kincaid().score, readab.flesch().score, readab.gunning_fog().score, readab.coleman_liau().score,
+             readab.dale_chall().score, readab.ari().score, readab.linsear_write().score, readab.spache().score])
 
         data_grades.append(textGrade)
 
+        # save all new words (except duplicates, thats why a set is used) of the training text
+        # if the grade is lower (and the words therefore should be known)
+        if int(textGrade) < grade:
+            for word in text.split():
+                word = re.sub(r'[^\w\s]', "", word).lower() # remove punctuation and capital letters
+                training_vocabulary.add(word)
 
-# training_readability()
+
+training_readability()
 # print(data_metrics)
 # print(data_grades)
 print('size of used data set: ' + str(len(data_metrics)))
@@ -71,5 +85,9 @@ for file in os.listdir(test_dirPath):
     print('Grammar: ')
 
     # grammar checking of new data
-    grammar.check_grammar(text)
+    # grammar.check_grammar(text)   TODO uncomment
+
+    # check for unknown words
+    training_vocabulary = vocabulary.add_additional_vocabulary(path_additional_vocabulary, training_vocabulary)
+    vocabulary.print_unknown_words(text, training_vocabulary)
 

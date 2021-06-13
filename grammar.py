@@ -41,10 +41,10 @@ def check_grammar(raw_text):
     global pos_text
     global parsed_text
 
-    raw_text = "I am not allowed to drive. He is able to work. They're not supposed to do this." \
-               "I have an idea. I have to do it. I hate myself. But I guess we got to do it ourselves. There's a" \
-               "tree over there. There is a new cafe in the centre of town which sells Indonesian food." \
-               "There’s a letter on your desk. Julia brought it from the mail room. There are three Japanese students in my class."
+    # raw_text = "I am not allowed to drive. He is able to work. They're not supposed to do this." \
+    #            "I have an idea. I have to do it. I hate myself. But I guess we got to do it ourselves. There's a" \
+    #            "tree over there. There is a new cafe in the centre of town which sells Indonesian food." \
+    #            "There’s a letter on your desk. Julia brought it from the mail room. There are three Japanese students in my class."
 
     text = str(raw_text)
     pos_parser = CoreNLPParser(url='http://localhost:9000', tagtype='pos')
