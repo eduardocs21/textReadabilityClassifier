@@ -56,17 +56,17 @@ def check_grammar(raw_text):
     # tense aspects
     search_tense_aspects()
 
-    # TODO: sentence parsing (for improved tense detection approach?)
-    sentences = text.split('. ')
-    sentences_token_list = []
-    for sentence in sentences:
-        sentences_token_list.append(sentence.split())
-
-    parsed_sentences = list(dep_parser.parse_sents(sentences_token_list))
-    for x in parsed_sentences:
-        for y in x:
-            print(y)
-            break
+    # # TODO: sentence parsing (for improved tense detection approach?)
+    # sentences = text.split('. ')
+    # sentences_token_list = []
+    # for sentence in sentences:
+    #     sentences_token_list.append(sentence.split())
+    #
+    # parsed_sentences = list(dep_parser.parse_sents(sentences_token_list))
+    # for x in parsed_sentences:
+    #     for y in x:
+    #         print(y)
+    #         break
 
     print("Dependency Parsing: " + str(
         [[(governor, dep, dependent) for governor, dep, dependent in parse.triples()] for parse in parsed_text]))
