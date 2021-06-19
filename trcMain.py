@@ -15,7 +15,7 @@ grade = 8
 
 data_metrics = []
 data_grades = []
-training_vocabulary = {"."}
+training_vocabulary = {"."} # define as a set
 text: str
 
 
@@ -35,10 +35,11 @@ def training_readability():
         textType = textType.split(".")[0]
 
         # filter text types that arent suitable for this analysis
-        if textType == "song" or textType == "dialog" or textType == "cloze":
+        if textType in ('dialog', 'cloze', 'mixed', 'german', 'poem', 'song', 'chants', 'bilingualmodule'):
             continue
 
         readab = Readability(text)
+
 
         # calculate readability scores and save as data
         data_metrics.append(
@@ -46,13 +47,6 @@ def training_readability():
              readab.dale_chall().score, readab.ari().score, readab.linsear_write().score, readab.spache().score])
 
         data_grades.append(textGrade)
-
-        # save all new words (except duplicates, thats why a set is used) of the training text
-        # if the grade is lower (and the words therefore should be known)
-        if int(textGrade) < grade:
-            for word in text.split():
-                word = re.sub(r'[^\w\s]', "", word).lower() # remove punctuation and capital letters
-                training_vocabulary.add(word)
 
 
 training_readability()
@@ -67,27 +61,42 @@ print('size of used data set: ' + str(len(data_metrics)))
 
 
 # prediction of new data
+
+
 for file in os.listdir(test_dirPath):
     with open(test_dirPath + '/' + file, encoding='utf-8') as f:
         text = f.read()
         f.close()
+
+    # READABILITY: compare readability of test text to training data
 
     r = Readability(text)
 
     test_metrics = [[r.flesch_kincaid().score, r.flesch().score, r.gunning_fog().score, r.coleman_liau().score,
                      r.dale_chall().score, r.ari().score, r.linsear_write().score, r.spache().score]]
 
+    print()
+    print('Evaluation of file: ' + file)
     print('---------')
-    print('readability results: ' + str(test_metrics))
-    # print('difficulty of input text is similar to a text from grade: ' + str(svm_evaluation.predict(
-      #   data_metrics, data_grades, test_metrics)))
+    print('Readability:')
+    print('scores: ' + str(test_metrics))
+    print('difficulty of input text is similar to a text from grade: ' + str(svm_evaluation.predict(
+       data_metrics, data_grades, test_metrics)))
     print('---------')
     print('Grammar: ')
 
-    # grammar checking of new data
-    # grammar.check_grammar(text)   TODO uncomment
+    # GRAMMAR: grammar checking of new data
+    # grammar.check_grammar(text)   # TODO uncomment
 
-    # check for unknown words
+    print('---------')
+    print('Vocabulary: ')
+
+    # VOCABULARY: check for unknown words
+    training_vocabulary = vocabulary.add_training_vocabulary(training_dirPath, grade, training_vocabulary)
     training_vocabulary = vocabulary.add_additional_vocabulary(path_additional_vocabulary, training_vocabulary)
     vocabulary.print_unknown_words(text, training_vocabulary)
+
+    print('---------' + '\n' + '\n' + '\n' + '\n' + '\n')
+
+
 

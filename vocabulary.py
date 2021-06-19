@@ -31,3 +31,23 @@ def add_additional_vocabulary(path, training_vocabulary):
     return training_vocabulary
 
 
+def add_training_vocabulary(training_dirPath, grade, training_vocabulary):
+
+    # save all words (except duplicates, thats why a set is used) of the training text
+    # if the grade is lower (and the words therefore should be known)
+
+    for file in os.listdir(training_dirPath):
+        with open(training_dirPath + '/' + file, encoding='utf-8') as f:
+            text = f.read()
+            f.close()
+
+        textGrade = file.split('_')[0]
+
+        if int(textGrade) < grade:
+            for word in text.split():
+                word = re.sub(r'[^\w\s]', "", word).lower()  # remove punctuation and capital letters
+                training_vocabulary.add(word)
+
+    return training_vocabulary
+
+
