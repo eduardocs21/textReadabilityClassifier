@@ -30,7 +30,7 @@ def classify(metrics, grades):
 def crossValidation(metrics, grades, n_splits):
 
     # validate with support vector machine
-    clf = svm.SVC(kernel='linear', C=5)
+    clf = svm.SVC(kernel='linear', C=10)
 
     # shuffle split in case the samples are ordered
     cv = ShuffleSplit(n_splits=n_splits, test_size=0.3, random_state=0)

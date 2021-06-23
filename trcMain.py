@@ -6,7 +6,7 @@ import svm_evaluation
 import grammar
 import vocabulary
 
-# configuration / user input
+# CONFIG / USER INPUT
 training_dirPath = 'training_data'
 test_dirPath = 'test_data'
 path_additional_vocabulary = 'vocabulary_data'
@@ -14,15 +14,25 @@ numberOfFoldsForCrossVal = 10
 grade = 6
 
 
+
+# TRAINING
+print("Training the algorithm for grade " + str(grade) + "...")
+# readability
+data_metrics, data_grades = readability_comparison.training_readability(training_dirPath)
+# vocabulary
 training_vocabulary = {"."}  # defined as a set
-print('input grade: ' + str(grade) + '\n')
+training_vocabulary = vocabulary.add_training_vocabulary(training_dirPath, grade, training_vocabulary)
+training_vocabulary = vocabulary.add_additional_vocabulary(path_additional_vocabulary, training_vocabulary)
 
 
 # cross-validation //TODO uncomment
-# scores = svm_evaluation.crossValidation(data_metrics, data_grades, numberOfFoldsForCrossVal)
-# accuracy = sum(scores) / numberOfFoldsForCrossVal
-# print('f1-score = ' + str(accuracy))
+scores = svm_evaluation.crossValidation(data_metrics, data_grades, numberOfFoldsForCrossVal)
+accuracy = sum(scores) / numberOfFoldsForCrossVal
+print('f1-score = ' + str(accuracy))
 
+
+# EVALUATION
+print("Finished")
 
 # prediction of texts in test data directory
 for file in os.listdir(test_dirPath):
@@ -36,7 +46,6 @@ for file in os.listdir(test_dirPath):
 
     # READABILITY: compare readability of test text to training data
     print('Readability:')
-    data_metrics, data_grades = readability_comparison.training_readability(training_dirPath)
     print('size of used data set: ' + str(len(data_metrics)))
     readability_comparison.compare(text, grade)
     print('--------- \n')
@@ -48,7 +57,5 @@ for file in os.listdir(test_dirPath):
 
     # VOCABULARY: check for unknown words
     print('Vocabulary: ')
-    training_vocabulary = vocabulary.add_training_vocabulary(training_dirPath, grade, training_vocabulary)
-    training_vocabulary = vocabulary.add_additional_vocabulary(path_additional_vocabulary, training_vocabulary)
     vocabulary.print_unknown_words(text, training_vocabulary)
     print('---------' + '\n' + '\n' + '\n' + '\n' + '\n')

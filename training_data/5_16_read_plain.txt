@@ -1,18 +1,11 @@
-Seller: Hi, can I help you?
-George: Hi. I’m looking for a new T-shirt.
-Seller: Any special event?
-George: Yes, I’m going to a birthday party.
-Seller: OK. What colour would you like?
-George: I’m not sure … red maybe … or purple. Black would be OK, too.
-Seller: Well, purple is a good colour. Let’s see. Here are three very nice 
-T-shirts and they’re really cheap.
-George: I’m not sure about the purple one because it’s got a dog on it.
-Seller: Well, this black T-shirt has got a skateboard on it.
-George: I don’t know. What about the green one behind you?
-Seller: That’s got a G on it.
-George: Perfect. Like G for George. How much is it?
-Seller: It’s £11.50.
-George: That’s too expensive. I’ve only got £10.
-Seller: OK then. You can have it for £10.
-George: Thanks a lot. Bye.
-Seller: Thanks, bye. And have a great party.
+Oleg
+I like breakfast. It is my favourite meal. Before school I haven’t got much time so I only eat cereal and toast. I drink tea and orange juice. At the weekend the whole family gets together. We have a traditional Russian breakfast.
+
+Hugo
+I go to school in the afternoon so I don’t get up very early. I make breakfast for me and my two little brothers. We have tortillas, eggs and salsa. We also eat beans and chicken with tomato sauce. We always have a lot of fruit, too: mango, papaya and so on.
+
+Antonia
+I eat a lot for breakfast because I am always hungry when I wake up. I eat bread rolls with cheese, ham or salami. Sometimes I also eat jam or honey or chocolate spread. I drink tea and apple juice.
+
+Sarah
+I get up very early. I have to take a bus because my school is not very close to my house. So I don’t eat breakfast at home. When I get to school we all have breakfast together. We have yoghurt and muesli, sandwiches and chocolate milk.

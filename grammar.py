@@ -529,7 +529,7 @@ def grammar_KLP11():
     print()
 
     # advanced modal verbs
-    print(search_regex('Advanced Modal Verbs', '(allowed|have|has|had|able|supposed) to'))
+    print(search_regex('Advanced Modal Verbs ("... to")', '(allowed|have|has|had|able|supposed) to'))
     print()
 
     # present perfect progressive
