@@ -35,26 +35,26 @@ pos_text: list
 parsed_text: list
 
 
-def check_grammar(raw_text):
+def check_grammar(raw_text, grade):
     # preparation (convert to string, generate and print pos-tags and dependency parses)
     global text
     global pos_text
     global parsed_text
 
-    raw_text = "I am not allowed to drive. He is able to work. They're not supposed to do this." \
-               "I have an idea. I have to do it. I hate myself. But I guess we got to do it ourselves. There's a" \
-               "tree over there. There is a new cafe in the centre of town which sells Indonesian food." \
-               "There’s a letter on your desk. Julia brought it from the mail room. There are three Japanese students in my class."
+    # raw_text = "I am not allowed to drive. He is able to work. They're not supposed to do this." \
+    #            "I have an idea. I have to do it. I hate myself. But I guess we got to do it ourselves. There's a" \
+    #            "tree over there. There is a new cafe in the centre of town which sells Indonesian food." \
+    #            "There’s a letter on your desk. Julia brought it from the mail room. There are three Japanese students in my class."
 
+    # Preparation: POS-Tagging and Dependency Parsing
     text = str(raw_text)
     pos_parser = CoreNLPParser(url='http://localhost:9000', tagtype='pos')
     pos_text = pos_parser.tag(text.split())
     print("POS-Tags: " + str(pos_text))
     dep_parser = CoreNLPDependencyParser(url='http://localhost:9000')
     parsed_text = list(dep_parser.parse(text.split()))
-
-    # tense aspects
-    search_tense_aspects()
+    print("Dependency Parsing: " + str(
+        [[(governor, dep, dependent) for governor, dep, dependent in parse.triples()] for parse in parsed_text]))
 
     # # TODO: sentence parsing (for improved tense detection approach?)
     # sentences = text.split('. ')
@@ -68,222 +68,17 @@ def check_grammar(raw_text):
     #         print(y)
     #         break
 
-    print("Dependency Parsing: " + str(
-        [[(governor, dep, dependent) for governor, dep, dependent in parse.triples()] for parse in parsed_text]))
-    print("---")
-    print("Results:")
+    # search and save tense aspects to print out in next step if necessary
+    search_tense_aspects()
 
-    # 1)
-    # plural of nouns
-    print(search_postags(['NNS', 'NNPS'], "plural of nouns"))
-    print()
-
-    # possessive ending (s-genitive)
-    print(search_postags(['POS'], "possessive ending (s-genitive)"))
-    print()
-
-    # adverbs (of frequency)
-    print(search_postags(['RB'], "adverbs and negations"))
-    print()
-
-    # comparative adjectives and adverbs
-    print(search_postags(['JJR', 'JJS', 'RBR', 'RBS'], "comparative adjectives (and adverbs)"))
-    print()
-
-    # 2)
-    # personal pronouns
-    print(search_postags(['PRP'], "personal pronoun"))
-    print()
-
-    # modal verbs (can/can't)
-    print(search_postags(['MD'], "modal verbs"))
-    print()
-
-    # TODO imperatives
-    # with parsed sentences: every VB that has no subject (dependencies: nsubj, csubj, nsubj:pass, csubj:pass)
-
-    # possessive determiners (different to absolute possessive pronouns)
-    poss_det, poss_pro = search_possessive_pronouns()
-
-    # if there are matches, print it out and return a dictionary containing word frequencies
-    if poss_det:
-        print('possessive determiners' + ': YES --- Details:')
-        frequency = {}
-        for item in poss_det:
-            frequency[item] = poss_det.count(item)
-        print(frequency)
-    else:
-        print('possessive determiners' + ': NO')
-    print()
-
-    # possessive pronouns (different to possessive determiners)
-    # if there are matches, print it out and return a dictionary containing word frequencies
-    if poss_pro:
-        print('possessive pronouns' + ': YES --- Details:')
-        frequency = {}
-        for item in poss_pro:
-            frequency[item] = poss_pro.count(item)
-        print(frequency)
-    else:
-        print('possessive pronouns' + ': NO')
-    print()
-
-    # present progressive
-    if pre_pro:
-        print("present progressive: YES --- Details:")
-        print(pre_pro)
-    else:
-        print("present progressive: NO")
-    print()
-
-    # simple past
-    print(search_postags(['VBD'], "simple past"))
-    print()
-
-    # TODO conditional clauses
-
-    # present perfect
-    if pre_per:
-        print("present perfect: YES --- Details:")
-        print(pre_per)
-        print()
-    else:
-        print("present perfect: NO")
-        print()
-
-    # future simple (will-future)
-    if fu_si:
-        print("future simple (will-future): YES --- Details:")
-        print(fu_si)
-    else:
-        print("future simple (will-future): NO")
-    print()
-
-    # going-to-future
-    if fu_gt:
-        print("going-to-future: YES --- Details:")
-        print(fu_gt)
-    else:
-        print("going-to-future: NO")
-    print()
-
-    # KLP9
-    print('-----')
-    print('KLP9')
-    print('-----')
-
-    # past progressive
-    if pa_pro:
-        print("past progressive: YES --- Details:")
-        print(pa_pro)
-    else:
-        print("past progressive: NO")
-    print()
-
-    # past perfect
-    if pa_per:
-        print("past perfect: YES --- Details:")
-        print(pa_per)
-    else:
-        print("past perfect: NO")
-    print()
-
-    # gerund
-    if gerund:
-        print("gerund: YES --- Details:")
-        print(gerund)
-    else:
-        print("gerund: NO")
-    print()
-
-    # present participle
-    if pre_part:
-        print("present participle: YES --- Details:")
-        print(pre_part)
-    else:
-        print("present participle: NO")
-    print()
-
-    # past participle
-    if pa_part:
-        print("past participle: YES --- Details:")
-        print(pa_part)
-    else:
-        print("past participle: NO")
-    print()
-
-    # passive
-    if passive:
-        print("passive: YES --- Details:")
-        print(passive)
-    else:
-        print("passive: NO")
-    print()
-
-    # TODO relative clauses
-
-    # TODO contact clauses
-
-    # reflexive pronouns
-    print(search_regex('reflexive pronouns', 'myself|yourself|herself|himself|ourselves|yourselves|themselves'))
-    print()
-
-    # KLP11
-    print('-----')
-    print('KLP11')
-    print('-----')
-
-    # future progressive
-    if fu_pro:
-        print("future progressive: YES --- Details:")
-        print(fu_pro)
-    else:
-        print("future progressive: NO")
-    print()
-
-    # future perfect
-    if fu_per:
-        print("future perfect: YES --- Details:")
-        print(fu_per)
-    else:
-        print("future perfect: NO")
-    print()
-
-    # future perfect progressive
-    if fu_per_pro:
-        print("future perfect progressive: YES --- Details:")
-        print(fu_per_pro)
-    else:
-        print("future perfect progressive: NO")
-    print()
-
-    # advanced modal verbs
-    print(search_regex('Advanced Modal Verbs', '(allowed|have|has|had|able|supposed) to'))
-    print()
-
-    # present perfect progressive
-    if pre_per_pro:
-        print("present perfect progressive: YES --- Details:")
-        print(pre_per_pro)
-    else:
-        print("present perfect progressive: NO")
-    print()
-
-    # past perfect progressive
-    if pa_per_pro:
-        print("past perfect progressive: YES --- Details:")
-        print(pa_per_pro)
-    else:
-        print("past perfect progressive: NO")
-    print()
-
-    # perfect participle
-    if per_part:
-        print("perfect participle: YES --- Details:")
-        print(per_part)
-    else:
-        print("perfect participle: NO")
-    print()
+    # search and print every grammar aspect of the school Curriculum ("Kernlehrplan KLP")
+    # which is above the input grade and therefore unknown for the students
+    if grade < 7:
+        grammar_KLP7()
+    if grade < 9:
+        grammar_KLP9()
+    if grade < 11:
+        grammar_KLP11()
 
 
 def search_postags(pos_tags, name):
@@ -339,7 +134,6 @@ def search_possessive_pronouns():
 
 # TODO write method for things like since/for (with module 're'?)
 def search_regex(name, regex):
-
     result = re.findall(regex, text)
     frequency = {}
 
@@ -507,7 +301,8 @@ def search_tense_aspects():
                     dep = parses_list[j][1]
                     if dep == 'punct':
                         break
-                    if (dep == 'aux' or dep == 'aux:pass') and (parses_list[j][0][0] == word or parses_list[j][2][0] == word):
+                    if (dep == 'aux' or dep == 'aux:pass') and (
+                            parses_list[j][0][0] == word or parses_list[j][2][0] == word):
                         pre_part_bool = False
                         break
                 if pre_part_bool:
@@ -525,7 +320,8 @@ def search_tense_aspects():
                     dep = parses_list[j][1]
                     if dep == 'punct':
                         break
-                    if (dep == 'aux' or dep == 'aux:pass') and (parses_list[j][0][0] == word or parses_list[j][2][0] == word):
+                    if (dep == 'aux' or dep == 'aux:pass') and (
+                            parses_list[j][0][0] == word or parses_list[j][2][0] == word):
                         pa_part_bool = False
                         break
                 if pa_part_bool:
@@ -538,6 +334,224 @@ def search_tense_aspects():
               "(according to Stanford Core NLP)")
 
 
+def grammar_KLP7():
+    # KLP7
+    print('---')
+    print('KLP7')
+    print('---')
+
+    # 1)
+    # plural of nouns
+    print(search_postags(['NNS', 'NNPS'], "plural of nouns"))
+    print()
+
+    # possessive ending (s-genitive)
+    print(search_postags(['POS'], "possessive ending (s-genitive)"))
+    print()
+
+    # adverbs (of frequency)
+    print(search_postags(['RB'], "adverbs and negations"))
+    print()
+
+    # comparative adjectives and adverbs
+    print(search_postags(['JJR', 'JJS', 'RBR', 'RBS'], "comparative adjectives (and adverbs)"))
+    print()
+
+    # 2)
+    # personal pronouns
+    print(search_postags(['PRP'], "personal pronoun"))
+    print()
+
+    # modal verbs (can/can't)
+    print(search_postags(['MD'], "modal verbs"))
+    print()
+
+    # TODO imperatives
+    # with parsed sentences: every VB that has no subject (dependencies: nsubj, csubj, nsubj:pass, csubj:pass)
+
+    # possessive determiners (different to absolute possessive pronouns)
+    poss_det, poss_pro = search_possessive_pronouns()
+
+    # if there are matches, print it out and return a dictionary containing word frequencies
+    if poss_det:
+        print('possessive determiners' + ': YES --- Details:')
+        frequency = {}
+        for item in poss_det:
+            frequency[item] = poss_det.count(item)
+        print(frequency)
+    else:
+        print('possessive determiners' + ': NO')
+    print()
+
+    # possessive pronouns (different to possessive determiners)
+    # if there are matches, print it out and return a dictionary containing word frequencies
+    if poss_pro:
+        print('possessive pronouns' + ': YES --- Details:')
+        frequency = {}
+        for item in poss_pro:
+            frequency[item] = poss_pro.count(item)
+        print(frequency)
+    else:
+        print('possessive pronouns' + ': NO')
+    print()
+
+    # present progressive
+    if pre_pro:
+        print("present progressive: YES --- Details:")
+        print(pre_pro)
+    else:
+        print("present progressive: NO")
+    print()
+
+    # simple past
+    print(search_postags(['VBD'], "simple past"))
+    print()
+
+    # TODO conditional clauses
+
+    # present perfect
+    if pre_per:
+        print("present perfect: YES --- Details:")
+        print(pre_per)
+        print()
+    else:
+        print("present perfect: NO")
+        print()
+
+    # future simple (will-future)
+    if fu_si:
+        print("future simple (will-future): YES --- Details:")
+        print(fu_si)
+    else:
+        print("future simple (will-future): NO")
+    print()
+
+    # going-to-future
+    if fu_gt:
+        print("going-to-future: YES --- Details:")
+        print(fu_gt)
+    else:
+        print("going-to-future: NO")
+    print()
 
 
+def grammar_KLP9():
+    # KLP9
+    print('---')
+    print('KLP9')
+    print('---')
 
+    # past progressive
+    if pa_pro:
+        print("past progressive: YES --- Details:")
+        print(pa_pro)
+    else:
+        print("past progressive: NO")
+    print()
+
+    # past perfect
+    if pa_per:
+        print("past perfect: YES --- Details:")
+        print(pa_per)
+    else:
+        print("past perfect: NO")
+    print()
+
+    # gerund
+    if gerund:
+        print("gerund: YES --- Details:")
+        print(gerund)
+    else:
+        print("gerund: NO")
+    print()
+
+    # present participle
+    if pre_part:
+        print("present participle: YES --- Details:")
+        print(pre_part)
+    else:
+        print("present participle: NO")
+    print()
+
+    # past participle
+    if pa_part:
+        print("past participle: YES --- Details:")
+        print(pa_part)
+    else:
+        print("past participle: NO")
+    print()
+
+    # passive
+    if passive:
+        print("passive: YES --- Details:")
+        print(passive)
+    else:
+        print("passive: NO")
+    print()
+
+    # TODO relative clauses
+
+    # TODO contact clauses
+
+    # reflexive pronouns
+    print(search_regex('reflexive pronouns', 'myself|yourself|herself|himself|ourselves|yourselves|themselves'))
+    print()
+
+
+def grammar_KLP11():
+    # KLP11
+    print('---')
+    print('KLP11')
+    print('---')
+
+    # future progressive
+    if fu_pro:
+        print("future progressive: YES --- Details:")
+        print(fu_pro)
+    else:
+        print("future progressive: NO")
+    print()
+
+    # future perfect
+    if fu_per:
+        print("future perfect: YES --- Details:")
+        print(fu_per)
+    else:
+        print("future perfect: NO")
+    print()
+
+    # future perfect progressive
+    if fu_per_pro:
+        print("future perfect progressive: YES --- Details:")
+        print(fu_per_pro)
+    else:
+        print("future perfect progressive: NO")
+    print()
+
+    # advanced modal verbs
+    print(search_regex('Advanced Modal Verbs ("... to")', '(allowed|have|has|had|able|supposed) to'))
+    print()
+
+    # present perfect progressive
+    if pre_per_pro:
+        print("present perfect progressive: YES --- Details:")
+        print(pre_per_pro)
+    else:
+        print("present perfect progressive: NO")
+    print()
+
+    # past perfect progressive
+    if pa_per_pro:
+        print("past perfect progressive: YES --- Details:")
+        print(pa_per_pro)
+    else:
+        print("past perfect progressive: NO")
+    print()
+
+    # perfect participle
+    if per_part:
+        print("perfect participle: YES --- Details:")
+        print(per_part)
+    else:
+        print("perfect participle: NO")
+    print()
