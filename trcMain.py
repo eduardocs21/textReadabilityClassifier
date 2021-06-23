@@ -14,7 +14,6 @@ numberOfFoldsForCrossVal = 10
 grade = 6
 
 
-
 # TRAINING
 print("Training the algorithm for grade " + str(grade) + "...")
 # readability
