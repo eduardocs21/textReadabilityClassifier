@@ -25,9 +25,9 @@ training_vocabulary = vocabulary.add_additional_vocabulary(path_additional_vocab
 
 
 # cross-validation //TODO uncomment
-scores = svm_evaluation.crossValidation(data_metrics, data_grades, numberOfFoldsForCrossVal)
-accuracy = sum(scores) / numberOfFoldsForCrossVal
-print('f1-score = ' + str(accuracy))
+# scores = svm_evaluation.crossValidation(data_metrics, data_grades, numberOfFoldsForCrossVal)
+# accuracy = sum(scores) / numberOfFoldsForCrossVal
+# print('f1-score = ' + str(accuracy))
 
 
 # EVALUATION

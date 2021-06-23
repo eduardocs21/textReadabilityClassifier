@@ -50,11 +50,11 @@ def check_grammar(raw_text, grade):
     text = str(raw_text)
     pos_parser = CoreNLPParser(url='http://localhost:9000', tagtype='pos')
     pos_text = pos_parser.tag(text.split())
-    print("POS-Tags: " + str(pos_text))
+    # print("POS-Tags: " + str(pos_text)) // TODO uncomment
     dep_parser = CoreNLPDependencyParser(url='http://localhost:9000')
     parsed_text = list(dep_parser.parse(text.split()))
-    print("Dependency Parsing: " + str(
-        [[(governor, dep, dependent) for governor, dep, dependent in parse.triples()] for parse in parsed_text]))
+    # print("Dependency Parsing: " + str( // TODO uncomment
+      #  [[(governor, dep, dependent) for governor, dep, dependent in parse.triples()] for parse in parsed_text]))
 
     # # TODO: sentence parsing (for improved tense detection approach?)
     # sentences = text.split('. ')
@@ -504,30 +504,6 @@ def grammar_KLP11():
     print('KLP11')
     print('---')
 
-    # future progressive
-    if fu_pro:
-        print("future progressive: YES --- Details:")
-        print(fu_pro)
-    else:
-        print("future progressive: NO")
-    print()
-
-    # future perfect
-    if fu_per:
-        print("future perfect: YES --- Details:")
-        print(fu_per)
-    else:
-        print("future perfect: NO")
-    print()
-
-    # future perfect progressive
-    if fu_per_pro:
-        print("future perfect progressive: YES --- Details:")
-        print(fu_per_pro)
-    else:
-        print("future perfect progressive: NO")
-    print()
-
     # advanced modal verbs
     print(search_regex('Advanced Modal Verbs ("... to")', '(allowed|have|has|had|able|supposed) to'))
     print()
@@ -554,4 +530,28 @@ def grammar_KLP11():
         print(per_part)
     else:
         print("perfect participle: NO")
+    print()
+
+    # future progressive
+    if fu_pro:
+        print("future progressive: YES --- Details:")
+        print(fu_pro)
+    else:
+        print("future progressive: NO")
+    print()
+
+    # future perfect
+    if fu_per:
+        print("future perfect: YES --- Details:")
+        print(fu_per)
+    else:
+        print("future perfect: NO")
+    print()
+
+    # future perfect progressive
+    if fu_per_pro:
+        print("future perfect progressive: YES --- Details:")
+        print(fu_per_pro)
+    else:
+        print("future perfect progressive: NO")
     print()
