@@ -29,6 +29,7 @@ fu_per_pro = []
 
 passive = []
 
+
 # basic data
 text: str
 pos_text: list
@@ -36,25 +37,42 @@ parsed_text: list
 
 
 def check_grammar(raw_text, grade):
-    # preparation (convert to string, generate and print pos-tags and dependency parses)
+    # preparation (convert to string, generate and print pos-tags and dependency parses, clear variables)
     global text
     global pos_text
     global parsed_text
 
-    # raw_text = "I am not allowed to drive. He is able to work. They're not supposed to do this." \
-    #            "I have an idea. I have to do it. I hate myself. But I guess we got to do it ourselves. There's a" \
-    #            "tree over there. There is a new cafe in the centre of town which sells Indonesian food." \
-    #            "There’s a letter on your desk. Julia brought it from the mail room. There are three Japanese students in my class."
+    fu_si.clear()
+    fu_gt.clear()
+
+    pre_per.clear()
+    pa_per.clear()
+    fu_per.clear()
+
+    pre_pro.clear()
+    pa_pro.clear()
+    fu_pro.clear()
+
+    pre_part.clear()
+    pa_part.clear()
+    per_part.clear()
+    gerund.clear()
+
+    pre_per_pro.clear()
+    pa_per_pro.clear()
+    fu_per_pro.clear()
+
+    passive.clear()
 
     # Preparation: POS-Tagging and Dependency Parsing
     text = str(raw_text)
     pos_parser = CoreNLPParser(url='http://localhost:9000', tagtype='pos')
     pos_text = pos_parser.tag(text.split())
-    # print("POS-Tags: " + str(pos_text)) // TODO uncomment
+    # print("POS-Tags: " + str(pos_text))   # TODO uncomment for bug hunt
     dep_parser = CoreNLPDependencyParser(url='http://localhost:9000')
     parsed_text = list(dep_parser.parse(text.split()))
-    # print("Dependency Parsing: " + str( // TODO uncomment
-      #  [[(governor, dep, dependent) for governor, dep, dependent in parse.triples()] for parse in parsed_text]))
+    # print("Dependency Parsing: " + str(   # TODO uncomment for bug hunt
+      # [[(governor, dep, dependent) for governor, dep, dependent in parse.triples()] for parse in parsed_text]))
 
     # # TODO: sentence parsing (for improved tense detection approach?)
     # sentences = text.split('. ')
@@ -132,7 +150,6 @@ def search_possessive_pronouns():
     return pd_words, pp_words
 
 
-# TODO write method for things like since/for (with module 're'?)
 def search_regex(name, regex):
     result = re.findall(regex, text)
     frequency = {}
