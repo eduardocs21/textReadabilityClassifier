@@ -3,6 +3,8 @@ import os
 
 
 def print_unknown_words(text, training_vocabulary):
+    # print a list of every word that is not included in the training vocabulary
+
     print("Number of known words: " + str(len(training_vocabulary)))
     unknown_vocabulary = []
 
@@ -12,14 +14,13 @@ def print_unknown_words(text, training_vocabulary):
         if word not in training_vocabulary:
             unknown_vocabulary.append(word)
 
-    # print out unseen words as “probably difficult words for the students”
     print("probably difficult vocabulary for these students (" + str(len(unknown_vocabulary)) + " words):")
     print(unknown_vocabulary)
 
 
 def add_additional_vocabulary(path, training_vocabulary):
-
     # read every file in the directory (path) and save word in 'training_vocabulary'
+
     for file in os.listdir(path):
         with open(path + '/' + file, encoding='utf-8') as f:
             text = f.read()
@@ -32,7 +33,6 @@ def add_additional_vocabulary(path, training_vocabulary):
 
 
 def add_training_vocabulary(training_dirPath, grade, training_vocabulary):
-
     # save all words (except duplicates, thats why a set is used) of the training text
     # if the grade is lower (and the words therefore should be known)
 

@@ -1,10 +1,10 @@
-import readability_comparison
+import readability_module
 import nltk
 # nltk.download('punkt')
 import os
 import svm_evaluation
-import grammar
-import vocabulary
+import grammar_module
+import vocabulary_module
 
 # CONFIG / USER INPUT
 training_dirPath = 'training_data'
@@ -17,11 +17,11 @@ grade = 6
 # TRAINING
 print("Training the algorithm for grade " + str(grade) + "...")
 # readability
-data_metrics, data_grades = readability_comparison.training_readability(training_dirPath)
+data_metrics, data_grades = readability_module.training_readability(training_dirPath)
 # vocabulary
 training_vocabulary = {"."}  # defined as a set
-training_vocabulary = vocabulary.add_training_vocabulary(training_dirPath, grade, training_vocabulary)
-training_vocabulary = vocabulary.add_additional_vocabulary(path_additional_vocabulary, training_vocabulary)
+training_vocabulary = vocabulary_module.add_training_vocabulary(training_dirPath, grade, training_vocabulary)
+training_vocabulary = vocabulary_module.add_additional_vocabulary(path_additional_vocabulary, training_vocabulary)
 print("Finished")
 
 
@@ -45,7 +45,7 @@ for file in os.listdir(test_dirPath):
     # READABILITY: compare readability of test text to training data
     print('Readability:')
     print('size of used data set: ' + str(len(data_metrics)))
-    readability_comparison.compare(text, grade)
+    readability_module.compare(text, grade)
     print('--------- \n')
 
     # GRAMMAR: grammar checking of new data
@@ -55,5 +55,5 @@ for file in os.listdir(test_dirPath):
 
     # VOCABULARY: check for unknown words
     print('Vocabulary: ')
-    vocabulary.print_unknown_words(text, training_vocabulary)
+    vocabulary_module.print_unknown_words(text, training_vocabulary)
     print('---------' + '\n' + '\n' + '\n' + '\n' + '\n')
