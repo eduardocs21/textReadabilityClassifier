@@ -21,10 +21,11 @@ def training_readability(path):
         textType = textType.split(".")[0]
 
         # filter text types that arent suitable for this analysis
-        if textType in ('dialog', 'cloze', 'mixed', 'german', 'poem', 'song', 'chants', 'bilingualmodule'):
+        if textType in ('german', 'mixed'):
             continue
 
         r = Readability(text)
+        # print(file) TODO uncomment for bug hunt in data
 
         # calculate readability scores and save as data
         data_metrics.append(
@@ -37,6 +38,8 @@ def training_readability(path):
 
 
 def compare(text, grade):
+    # predict the grade of the text by using the trained SVM and compare the result
+
     r = Readability(text)
 
     test_metrics = [[r.flesch_kincaid().score, r.flesch().score, r.gunning_fog().score, r.coleman_liau().score,

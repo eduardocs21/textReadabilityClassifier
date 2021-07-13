@@ -7,40 +7,36 @@ from sklearn.metrics import classification_report
 from sklearn.metrics import make_scorer
 
 
-X = [[1, 1], [1, 2], [3, 3], [4, 3], [3, 5]]
-y = [0, 1, 1, 0, 0]
-
-
-def classify(metrics, grades):
-    X_train, X_test, y_train, y_test = train_test_split(metrics, grades, test_size=0.3)
-    # X_train, X_test, y_train, y_test = train_test_split(metrics, grades, test_size=0.2, random_state=0)
-
-
-    # X_train.shape, y_train.shape((90, 4), (90,))
-    # X_test.shape, y_test.shape((60, 4), (60,))
-
-    clf = SVC(kernel='linear').fit(X_train, y_train)
-    # clf.score(X_test, y_test)
-    y_predict = clf.predict(X_test)
-    print(X_test)
-    print(y_predict)
-    print(classification_report(y_test, y_predict))
-
-
-def crossValidation(metrics, grades, n_splits):
+def cross_validation(metrics, grades, n_splits):
+    # evaluate the performance of the readability prediction model
 
     # validate with support vector machine
-    clf = svm.SVC(kernel='linear', C=10)
+    clf = svm.SVC(kernel='linear', C=1)
 
     # shuffle split in case the samples are ordered
-    cv = ShuffleSplit(n_splits=n_splits, test_size=0.3, random_state=0)
+    cv = ShuffleSplit(n_splits=n_splits, test_size=0.3, random_state=5)
 
     # return the f1-score produced by cross-validation
-    return cross_val_score(clf, metrics, grades, cv=cv, scoring='f1_weighted')
+    return cross_val_score(clf, metrics, grades, cv=cv, scoring='f1_micro')
 
 
 def predict(trainingMetrics, trainingGrades, testMetrics):
+    # predict the grade of the text by using the trained SVM
 
     clf = svm.SVC(kernel='linear').fit(trainingMetrics, trainingGrades)
     return clf.predict(testMetrics)
+
+
+def calculate_baseline(data_grades):
+    # calculate baseline to compare to cross-Validation f-Score by always picking majority class
+
+    # count data sets and store in list and sort it ascending
+    sample_size_list = [data_grades.count('5'), data_grades.count('6'), data_grades.count('7'), data_grades.count('9')]
+
+    # calculate accuracy by dividing highest number by other numbers combined
+    print("sample size = " + str(sample_size_list))
+    sorted_list = sorted(sample_size_list)
+    baseline = sorted_list[-1] / sum(sorted_list)
+
+    return baseline
 

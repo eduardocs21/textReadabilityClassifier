@@ -37,11 +37,14 @@ parsed_text: list
 
 
 def check_grammar(raw_text, grade):
-    # preparation (convert to string, generate and print pos-tags and dependency parses, clear variables)
+    # check the text for specific grammatical phenomena relevant for students
+
+    # PREPARATION
     global text
     global pos_text
     global parsed_text
 
+    # clear variables in case multiple texts are checked during on execution of the program
     fu_si.clear()
     fu_gt.clear()
 
@@ -64,33 +67,23 @@ def check_grammar(raw_text, grade):
 
     passive.clear()
 
-    # Preparation: POS-Tagging and Dependency Parsing
+    # generate and print POS-Tags and Dependency Parses by Stanford Core NLP
     text = str(raw_text)
     pos_parser = CoreNLPParser(url='http://localhost:9000', tagtype='pos')
     pos_text = pos_parser.tag(text.split())
-    # print("POS-Tags: " + str(pos_text))   # TODO uncomment for bug hunt
+    # print("POS-Tags: " + str(pos_text))   # TODO uncomment to print parses for bug hunt
     dep_parser = CoreNLPDependencyParser(url='http://localhost:9000')
     parsed_text = list(dep_parser.parse(text.split()))
-    # print("Dependency Parsing: " + str(   # TODO uncomment for bug hunt
-      # [[(governor, dep, dependent) for governor, dep, dependent in parse.triples()] for parse in parsed_text]))
+    # print("Dependency Parsing: " + str(   # TODO uncomment to print parses for bug hunt
+        # [[(governor, dep, dependent) for governor, dep, dependent in parse.triples()] for parse in parsed_text]))
 
-    # # TODO: sentence parsing (for improved tense detection approach?)
-    # sentences = text.split('. ')
-    # sentences_token_list = []
-    # for sentence in sentences:
-    #     sentences_token_list.append(sentence.split())
-    #
-    # parsed_sentences = list(dep_parser.parse_sents(sentences_token_list))
-    # for x in parsed_sentences:
-    #     for y in x:
-    #         print(y)
-    #         break
+    # EXECUTION
 
-    # search and save tense aspects to print out in next step if necessary
+    # search and save occurrences of tense aspects to print out in next step if necessary
     search_tense_aspects()
 
-    # search and print every grammar aspect of the school Curriculum ("Kernlehrplan KLP")
-    # which is above the input grade and therefore unknown for the students
+    # search and print occurrences of every grammatical phenomena of the school Curriculum ("Kernlehrplan KLP") ...
+    # that is above the input grade and therefore theoretically unknown for the students
     if grade < 7:
         grammar_KLP7()
     if grade < 9:
@@ -100,6 +93,8 @@ def check_grammar(raw_text, grade):
 
 
 def search_postags(pos_tags, name):
+    # return every word that has one of the given POS-Tags
+
     words = []
     frequency = {}
 
@@ -122,9 +117,10 @@ def search_postags(pos_tags, name):
     return frequency
 
 
-# searches for possessive pronouns and differentiates them between possessive determiners and pronouns
-# returns separate word lists (all lowercase)
 def search_possessive_pronouns():
+    # searches for possessive pronouns and differentiates them between possessive determiners and pronouns
+    # and returns separate word lists (all lowercase)
+
     pd_words = []
     pp_words = []
 
@@ -151,6 +147,8 @@ def search_possessive_pronouns():
 
 
 def search_regex(name, regex):
+    # return every word that includes the given regex
+
     result = re.findall(regex, text)
     frequency = {}
 
@@ -352,7 +350,8 @@ def search_tense_aspects():
 
 
 def grammar_KLP7():
-    # KLP7
+    # print grammatical phenomena that should be known in the 7.grade according to the curriculum
+
     print('---')
     print('KLP7')
     print('---')
@@ -384,12 +383,13 @@ def grammar_KLP7():
     print()
 
     # TODO imperatives
-    # with parsed sentences: every VB that has no subject (dependencies: nsubj, csubj, nsubj:pass, csubj:pass)
+    # possible approach with parsed sentences:
+    # every VB that has no subject (dependencies: nsubj, csubj, nsubj:pass, csubj:pass)
 
     # possessive determiners (different to absolute possessive pronouns)
+    # if there are matches, print it out and return a dictionary containing word frequencies
     poss_det, poss_pro = search_possessive_pronouns()
 
-    # if there are matches, print it out and return a dictionary containing word frequencies
     if poss_det:
         print('possessive determiners' + ': YES --- Details:')
         frequency = {}
@@ -453,7 +453,8 @@ def grammar_KLP7():
 
 
 def grammar_KLP9():
-    # KLP9
+    # print grammatical phenomena that should be known in the 7.grade according to the curriculum
+
     print('---')
     print('KLP9')
     print('---')
@@ -516,7 +517,8 @@ def grammar_KLP9():
 
 
 def grammar_KLP11():
-    # KLP11
+    # print grammatical phenomena that should be known in the 7.grade according to the curriculum
+
     print('---')
     print('KLP11')
     print('---')

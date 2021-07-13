@@ -22,25 +22,24 @@ data_metrics, data_grades = readability_comparison.training_readability(training
 training_vocabulary = {"."}  # defined as a set
 training_vocabulary = vocabulary.add_training_vocabulary(training_dirPath, grade, training_vocabulary)
 training_vocabulary = vocabulary.add_additional_vocabulary(path_additional_vocabulary, training_vocabulary)
-
-
-# cross-validation //TODO uncomment
-# scores = svm_evaluation.crossValidation(data_metrics, data_grades, numberOfFoldsForCrossVal)
-# accuracy = sum(scores) / numberOfFoldsForCrossVal
-# print('f1-score = ' + str(accuracy))
-
-
-# EVALUATION
 print("Finished")
 
-# prediction of texts in test data directory
+
+# CROSS-VALIDATION READABILITY //TODO uncomment for readability evaluation
+# scores = svm_evaluation.crossValidation(data_metrics, data_grades, numberOfFoldsForCrossVal)
+# accuracy = sum(scores) / numberOfFoldsForCrossVal
+# print('baseline accuracy = ' + str(svm_evaluation.calculate_baseline(data_grades)))
+# print('algorithm accuracy = ' + str(accuracy))
+
+
+# ANALYSIS of texts in test data directory
 for file in os.listdir(test_dirPath):
     with open(test_dirPath + '/' + file, encoding='utf-8') as f:
         text = f.read()
         f.close()
 
     print()
-    print('Evaluation of file: ' + file)
+    print('Analysis of file: ' + file)
     print('---------')
 
     # READABILITY: compare readability of test text to training data
@@ -51,7 +50,7 @@ for file in os.listdir(test_dirPath):
 
     # GRAMMAR: grammar checking of new data
     print('Grammar: ')
-    grammar.check_grammar(text, grade)
+    # grammar.check_grammar(text, grade) TODO uncomment
     print('\n---------')
 
     # VOCABULARY: check for unknown words
