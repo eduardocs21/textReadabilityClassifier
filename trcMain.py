@@ -50,7 +50,7 @@ for file in os.listdir(test_dirPath):
 
     # GRAMMAR: grammar checking of new data
     print('Grammar: ')
-    # grammar.check_grammar(text, grade) TODO uncomment
+    grammar_module.check_grammar(text, grade)
     print('\n---------')
 
     # VOCABULARY: check for unknown words

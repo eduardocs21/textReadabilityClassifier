@@ -200,14 +200,13 @@ def search_tense_aspects():
                 # present participle: ("-ing")
                 elif tag1 == 'VBG':
                     # present progressive and going-to future and one passive form (to be + having + VBN)
-                    if word2 == 'am' or word2 == 'are' or word2 == 'is' or word2 == "'m" or word2 == "'re":
+                    if word2 in ('am', 'are', 'is', "'m", "'re"):
                         not_identified = True
                         if word1 == 'going':
                             # search for additional xcomp VB with dependency to word1 until sentence part ends
                             for j in range(sentence_start + 1, len(parses_list)):
                                 dep = parses_list[j][1]
-                                if dep == 'punct' or dep == 'nsubj' or dep == 'csubj' or \
-                                        dep == 'nsubj:pass' or dep == 'csubj:pass':
+                                if dep in ('punct', 'nsubj', 'csubj', 'nsubj:pass', 'csubj:pass'):
                                     break
                                 if dep == 'xcomp' and parses_list[j][2][1] == 'VB':
                                     fu_gt.append(word2 + " " + word1 + " to " + parses_list[j][2][0])
@@ -217,8 +216,7 @@ def search_tense_aspects():
                             # search for additional ccomp VBN with dependency to word1 until sentence part ends
                             for j in range(sentence_start + 1, len(parses_list)):
                                 dep = parses_list[j][1]
-                                if dep == 'punct' or dep == 'nsubj' or dep == 'csubj' or \
-                                        dep == 'nsubj:pass' or dep == 'csubj:pass':
+                                if dep in ('punct', 'nsubj', 'csubj', 'nsubj:pass', 'csubj:pass'):
                                     break
                                 if dep == 'ccomp' and parses_list[j][2][1] == 'VBN':
                                     passive.append(word2 + " " + word1 + " (obj) " + parses_list[j][2][0])
@@ -234,8 +232,7 @@ def search_tense_aspects():
                         # search for additional keyword "be" with dependency to word1 until sentence part ends
                         for j in range(sentence_start + 1, len(parses_list)):
                             dep = parses_list[j][1]
-                            if dep == 'punct' or dep == 'nsubj' or dep == 'csubj' or \
-                                    dep == 'nsubj:pass' or dep == 'csubj:pass':
+                            if dep in ('punct', 'nsubj', 'csubj', 'nsubj:pass', 'csubj:pass'):
                                 break
                             if parses_list[j][2][0] == 'be' and parses_list[j][0][0] == word1:
                                 fu_pro.append(word2 + " be " + word1)
@@ -246,16 +243,14 @@ def search_tense_aspects():
                         # search for additional keyword "have" with dependency to word1 until sentence part ends
                         for j in range(sentence_start + 1, len(parses_list)):
                             dep = parses_list[j][1]
-                            if dep == 'punct' or dep == 'nsubj' or dep == 'csubj' or \
-                                    dep == 'nsubj:pass' or dep == 'csubj:pass':
+                            if dep in ('punct', 'nsubj', 'csubj', 'nsubj:pass', 'csubj:pass'):
                                 break
                             if parses_list[j][2][0] == 'have' or parses_list[j][2][0] == 'has' \
                                     or parses_list[j][2][0] == "'ve":
                                 # search for additional keyword "will" with dependency to word1 until sentence part ends
                                 for k in range(sentence_start + 1, len(parses_list)):
                                     dep = parses_list[k][1]
-                                    if dep == 'punct' or dep == 'nsubj' or dep == 'csubj' or \
-                                            dep == 'nsubj:pass' or dep == 'csubj:pass':
+                                    if dep in ('punct', 'nsubj', 'csubj', 'nsubj:pass', 'csubj:pass'):
                                         break
                                     if parses_list[k][2][0] == 'will' or parses_list[k][2][0] == 'wo' \
                                             or parses_list[k][2][0] == "'ll":
@@ -282,8 +277,7 @@ def search_tense_aspects():
                         # search for additional keyword "will" with dependency to word1 until sentence part ends
                         for j in range(sentence_start + 1, len(parses_list)):
                             dep = parses_list[j][1]
-                            if dep == 'punct' or dep == 'nsubj' or dep == 'csubj' or \
-                                    dep == 'nsubj:pass' or dep == 'csubj:pass':
+                            if dep in ('punct', 'nsubj', 'csubj', 'nsubj:pass', 'csubj:pass'):
                                 break
                             if parses_list[j][2][0] == 'will' or parses_list[j][2][0] == 'wo' \
                                     or parses_list[j][2][0] == "'ll":
