@@ -1,4 +1,4 @@
-For the Grammar-Module to work, a Stanford Core NLP Server has to be started manually.
+For the Grammar-Module to work, a Stanford Core NLP Server (Java) has to be started manually.
 (Reason: Usage of POS-Tagger and Dependency Parser)
 
 
