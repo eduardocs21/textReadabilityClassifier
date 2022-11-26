@@ -1,5 +1,6 @@
 stanford-corenlp-4.2.0/
-test_data
-test_data_2
-training_data
-vocabulary_data
+test_data/
+test_data_2/
+training_data/
+vocabulary_data/
+raw_data.zip
