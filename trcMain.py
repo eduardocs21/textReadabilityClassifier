@@ -11,7 +11,7 @@ training_dirPath = 'training_data'
 test_dirPath = 'test_data'
 path_additional_vocabulary = 'vocabulary_data'
 numberOfFoldsForCrossVal = 10
-grade = 6
+grade = 10
 
 
 # TRAINING
